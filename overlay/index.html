@@ -14,6 +14,7 @@
       --accent: #3b82f6;
       --live: #ef4444;
       --success: #22c55e;
+      --duck: #ff6b9d;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -27,12 +28,12 @@
       position: absolute;
       top: 20px;
       right: 20px;
-      width: 280px; /* SMALARE */
-      max-height: none; /* INGEN MAX-HÖJD */
+      width: 280px;
+      max-height: none;
       background: var(--bg-primary);
       border: 1px solid var(--border);
       border-radius: 16px;
-      overflow: visible; /* INGEN SCROLL */
+      overflow: visible;
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
       display: flex;
       flex-direction: column;
@@ -40,22 +41,22 @@
     }
     .overlay-header {
       background: var(--bg-card);
-      padding: 12px 16px; /* MINDRE PADDING */
+      padding: 12px 16px;
       border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .brand { font-weight: 800; font-size: 13px; letter-spacing: 0.5px; } /* MINDRE TEXT */
+    .brand { font-weight: 800; font-size: 13px; letter-spacing: 0.5px; }
     .live-badge {
       display: flex;
       align-items: center;
       gap: 5px;
-      padding: 4px 10px; /* MINDRE PADDING */
+      padding: 4px 10px;
       background: rgba(239, 68, 68, 0.15);
       border: 1px solid rgba(239, 68, 68, 0.3);
       border-radius: 100px;
-      font-size: 9px; /* MINDRE TEXT */
+      font-size: 9px;
       font-weight: 800;
       color: var(--live);
       text-transform: uppercase;
@@ -72,41 +73,45 @@
       50% { opacity: 0.4; transform: scale(0.8); }
     }
     .current-section {
-      padding: 14px 16px; /* MINDRE PADDING */
+      padding: 14px 16px;
       background: linear-gradient(180deg, rgba(59, 130, 246, 0.08) 0%, transparent 100%);
       border-bottom: 1px solid var(--border);
     }
     .current-section.inactive { background: transparent; opacity: 0.6; }
+    .current-section.duck {
+      background: linear-gradient(180deg, rgba(255, 107, 157, 0.08) 0%, transparent 100%);
+    }
     .section-label {
-      font-size: 9px; /* MINDRE TEXT */
+      font-size: 9px;
       color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      margin-bottom: 8px; /* MINDRE MARGINAL */
+      margin-bottom: 8px;
       font-weight: 700;
     }
-    .current-user { font-size: 16px; font-weight: 800; margin-bottom: 2px; } /* MINDRE TEXT */
-    .current-product { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; } /* MINDRE TEXT */
+    .current-user { font-size: 16px; font-weight: 800; margin-bottom: 2px; }
+    .current-product { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
     .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 10px; /* MINDRE PADDING */
+      padding: 4px 10px;
       border-radius: 100px;
-      font-size: 9px; /* MINDRE TEXT */
+      font-size: 9px;
       font-weight: 800;
       text-transform: uppercase;
     }
     .status-live { background: rgba(34, 197, 94, 0.15); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.3); }
     .status-waiting { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .status-duck { background: rgba(255, 107, 157, 0.15); color: var(--duck); border: 1px solid rgba(255, 107, 157, 0.3); }
     
     .queue-section { 
       flex: 1; 
-      overflow: visible; /* INGEN SCROLL */
-      max-height: none; /* INGEN MAX-HÖJD */
+      overflow: visible;
+      max-height: none;
     }
     .queue-header {
-      padding: 12px 16px 8px; /* MINDRE PADDING */
+      padding: 12px 16px 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -115,48 +120,57 @@
     }
     .queue-title { font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
     .queue-count {
-      font-size: 11px; /* MINDRE TEXT */
+      font-size: 11px;
       color: var(--text-primary);
       font-weight: 800;
       background: rgba(59, 130, 246, 0.2);
-      padding: 3px 8px; /* MINDRE PADDING */
+      padding: 3px 8px;
       border-radius: 100px;
     }
-    .queue-list { padding: 6px; } /* MINDRE PADDING */
+    .queue-list { padding: 6px; }
     .queue-item {
       display: flex;
       align-items: center;
-      gap: 10px; /* MINDRE GAP */
-      padding: 8px 12px; /* MINDRE PADDING */
-      margin-bottom: 4px; /* MINDRE MARGINAL */
+      gap: 10px;
+      padding: 8px 12px;
+      margin-bottom: 4px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border);
-      border-radius: 8px; /* MINDRE RADIUS */
+      border-radius: 8px;
+    }
+    .queue-item.duck {
+      border-color: var(--duck);
+      background: rgba(255, 107, 157, 0.05);
     }
     .queue-position {
-      width: 24px; /* MINDRE */
-      height: 24px; /* MINDRE */
+      width: 24px;
+      height: 24px;
       background: rgba(59, 130, 246, 0.2);
       border: 1px solid var(--accent);
-      border-radius: 6px; /* MINDRE */
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px; /* MINDRE TEXT */
+      font-size: 11px;
       font-weight: 800;
       color: var(--accent);
       flex-shrink: 0;
     }
+    .queue-position.duck {
+      background: rgba(255, 107, 157, 0.2);
+      border-color: var(--duck);
+      color: var(--duck);
+    }
     .queue-info { flex: 1; min-width: 0; }
     .queue-username { 
-      font-size: 13px; /* MINDRE TEXT */
+      font-size: 13px;
       font-weight: 700; 
       white-space: nowrap; 
       overflow: hidden; 
       text-overflow: ellipsis; 
     }
     .queue-product { 
-      font-size: 10px; /* MINDRE TEXT */
+      font-size: 10px;
       color: var(--text-secondary); 
       white-space: nowrap; 
       overflow: hidden; 
@@ -164,23 +178,23 @@
     }
     
     .stats-footer {
-      padding: 12px 16px; /* MINDRE PADDING */
+      padding: 12px 16px;
       background: var(--bg-card);
       border-top: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
-      font-size: 10px; /* MINDRE TEXT */
+      font-size: 10px;
       color: var(--text-secondary);
     }
     .stat-item { display: flex; align-items: center; gap: 6px; }
     .stat-value { color: var(--text-primary); font-weight: 800; }
     
-    .empty-state { text-align: center; padding: 20px 16px; color: var(--text-secondary); font-size: 12px; } /* MINDRE PADDING/TEXT */
+    .empty-state { text-align: center; padding: 20px 16px; color: var(--text-secondary); font-size: 12px; }
     .demo-notice {
       position: fixed;
       bottom: 10px;
       right: 10px;
-      font-size: 8px; /* MINDRE TEXT */
+      font-size: 8px;
       color: rgba(255,255,255,0.2);
       background: rgba(0,0,0,0.5);
       padding: 4px 8px;
@@ -253,46 +267,57 @@
       
       if (currentOrder) {
         currentSection.classList.remove('inactive');
+        // 🦆 Kolla om det är manuell duckrace
+        if (currentOrder.type === 'duck' && currentOrder.manualDuck) {
+          currentSection.classList.add('duck');
+          currentSection.style.borderColor = 'var(--duck)';
+          statusBadge.textContent = '🦆 DUCKRACE';
+          statusBadge.className = 'status-badge status-duck';
+        } else {
+          currentSection.classList.remove('duck');
+          currentSection.style.borderColor = 'var(--success)';
+          statusBadge.textContent = 'LIVE NU';
+          statusBadge.className = 'status-badge status-live';
+        }
         currentUser.textContent = currentOrder.username || '@okänd';
         currentProduct.textContent = currentOrder.product || '-';
-        statusBadge.textContent = 'LIVE NU';
-        statusBadge.className = 'status-badge status-live';
       } else {
+        currentSection.classList.remove('duck');
         currentSection.classList.add('inactive');
+        currentSection.style.borderColor = 'var(--border)';
         currentUser.textContent = '@väntar...';
         currentProduct.textContent = 'Ingen order öppnas just nu';
         statusBadge.textContent = 'Väntar';
         statusBadge.className = 'status-badge status-waiting';
       }
       
-      document.getElementById('queue-count').textContent = waitingQueue.length;
+      // 🦆 Filtrera: visa allt UTOM automatiska Shopify-duckrace
+      const visibleQueue = waitingQueue.filter(order => {
+        // Filtrera bort endast om det är duckrace UTAN manualDuck-flagga
+        if (order.type === 'duck' && !order.manualDuck) {
+          return false; // Shopify-duckrace filtreras bort
+        }
+        return true; // Allt annat visas (inklusive manualDuck)
+      });
+      
+      document.getElementById('queue-count').textContent = visibleQueue.length;
       const queueList = document.getElementById('queue-list');
       
-      if (waitingQueue.length === 0) {
+      if (visibleQueue.length === 0) {
         queueList.innerHTML = '<div class="empty-state">Ingen kö just nu</div>';
       } else {
-        // 🦆 Filtrera bort Duckrace från overlay
-        const ripShipQueue = waitingQueue.filter(order => 
-          !order.product.toLowerCase().includes('duck') &&
-          !order.product.toLowerCase().includes('race')
-        );
-        
-        if (ripShipQueue.length === 0) {
-          queueList.innerHTML = '<div class="empty-state">Endast Duckrace i kö (visas ej här)</div>';
-        } else {
-          queueList.innerHTML = ripShipQueue.slice(0, 3).map((order, index) => `
-            <div class="queue-item">
-              <div class="queue-position">${index + 1}</div>
-              <div class="queue-info">
-                <div class="queue-username">${order.username || '@okänd'}</div>
-                <div class="queue-product">${order.product.replace(' [DUCKRACE]', '')}</div>
-              </div>
+        queueList.innerHTML = visibleQueue.slice(0, 5).map((order, index) => `
+          <div class="queue-item ${order.type === 'duck' && order.manualDuck ? 'duck' : ''}">
+            <div class="queue-position ${order.type === 'duck' && order.manualDuck ? 'duck' : ''}">${index + 1}</div>
+            <div class="queue-info">
+              <div class="queue-username">${order.username || '@okänd'}</div>
+              <div class="queue-product">${order.product}</div>
             </div>
-          `).join('');
-        }
+          </div>
+        `).join('');
       }
       
-      document.getElementById('est-time').textContent = (waitingQueue.length * 5) + ' min';
+      document.getElementById('est-time').textContent = (visibleQueue.length * 5) + ' min';
       document.getElementById('completed-count').textContent = completed;
     }
 
