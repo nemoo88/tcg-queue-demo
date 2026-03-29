@@ -27,12 +27,12 @@
       position: absolute;
       top: 20px;
       right: 20px;
-      width: 320px;
-      max-height: 480px;
+      width: 280px; /* SMALARE */
+      max-height: none; /* INGEN MAX-HÖJD */
       background: var(--bg-primary);
       border: 1px solid var(--border);
       border-radius: 16px;
-      overflow: hidden;
+      overflow: visible; /* INGEN SCROLL */
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
       display: flex;
       flex-direction: column;
@@ -40,22 +40,22 @@
     }
     .overlay-header {
       background: var(--bg-card);
-      padding: 14px 18px;
+      padding: 12px 16px; /* MINDRE PADDING */
       border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .brand { font-weight: 800; font-size: 14px; letter-spacing: 0.5px; }
+    .brand { font-weight: 800; font-size: 13px; letter-spacing: 0.5px; } /* MINDRE TEXT */
     .live-badge {
       display: flex;
       align-items: center;
       gap: 5px;
-      padding: 5px 10px;
+      padding: 4px 10px; /* MINDRE PADDING */
       background: rgba(239, 68, 68, 0.15);
       border: 1px solid rgba(239, 68, 68, 0.3);
       border-radius: 100px;
-      font-size: 10px;
+      font-size: 9px; /* MINDRE TEXT */
       font-weight: 800;
       color: var(--live);
       text-transform: uppercase;
@@ -72,102 +72,116 @@
       50% { opacity: 0.4; transform: scale(0.8); }
     }
     .current-section {
-      padding: 18px;
+      padding: 14px 16px; /* MINDRE PADDING */
       background: linear-gradient(180deg, rgba(59, 130, 246, 0.08) 0%, transparent 100%);
       border-bottom: 1px solid var(--border);
     }
     .current-section.inactive { background: transparent; opacity: 0.6; }
     .section-label {
-      font-size: 10px;
+      font-size: 9px; /* MINDRE TEXT */
       color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      margin-bottom: 10px;
+      margin-bottom: 8px; /* MINDRE MARGINAL */
       font-weight: 700;
     }
-    .current-user { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
-    .current-product { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+    .current-user { font-size: 16px; font-weight: 800; margin-bottom: 2px; } /* MINDRE TEXT */
+    .current-product { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; } /* MINDRE TEXT */
     .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 12px;
+      padding: 4px 10px; /* MINDRE PADDING */
       border-radius: 100px;
-      font-size: 10px;
+      font-size: 9px; /* MINDRE TEXT */
       font-weight: 800;
       text-transform: uppercase;
     }
     .status-live { background: rgba(34, 197, 94, 0.15); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.3); }
     .status-waiting { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
     
-    .queue-section { flex: 1; overflow-y: auto; max-height: 280px; }
+    .queue-section { 
+      flex: 1; 
+      overflow: visible; /* INGEN SCROLL */
+      max-height: none; /* INGEN MAX-HÖJD */
+    }
     .queue-header {
-      padding: 14px 18px 10px;
+      padding: 12px 16px 8px; /* MINDRE PADDING */
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border);
       background: var(--bg-card);
-      position: sticky;
-      top: 0;
-      z-index: 10;
     }
-    .queue-title { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+    .queue-title { font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
     .queue-count {
-      font-size: 12px;
+      font-size: 11px; /* MINDRE TEXT */
       color: var(--text-primary);
       font-weight: 800;
       background: rgba(59, 130, 246, 0.2);
-      padding: 4px 10px;
+      padding: 3px 8px; /* MINDRE PADDING */
       border-radius: 100px;
     }
-    .queue-list { padding: 8px; }
+    .queue-list { padding: 6px; } /* MINDRE PADDING */
     .queue-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      margin-bottom: 6px;
+      gap: 10px; /* MINDRE GAP */
+      padding: 8px 12px; /* MINDRE PADDING */
+      margin-bottom: 4px; /* MINDRE MARGINAL */
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 8px; /* MINDRE RADIUS */
     }
     .queue-position {
-      width: 28px;
-      height: 28px;
+      width: 24px; /* MINDRE */
+      height: 24px; /* MINDRE */
       background: rgba(59, 130, 246, 0.2);
       border: 1px solid var(--accent);
-      border-radius: 8px;
+      border-radius: 6px; /* MINDRE */
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      font-size: 11px; /* MINDRE TEXT */
       font-weight: 800;
       color: var(--accent);
+      flex-shrink: 0;
     }
     .queue-info { flex: 1; min-width: 0; }
-    .queue-username { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .queue-product { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .queue-username { 
+      font-size: 13px; /* MINDRE TEXT */
+      font-weight: 700; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+    }
+    .queue-product { 
+      font-size: 10px; /* MINDRE TEXT */
+      color: var(--text-secondary); 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+    }
     
     .stats-footer {
-      padding: 14px 18px;
+      padding: 12px 16px; /* MINDRE PADDING */
       background: var(--bg-card);
       border-top: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
-      font-size: 11px;
+      font-size: 10px; /* MINDRE TEXT */
       color: var(--text-secondary);
     }
     .stat-item { display: flex; align-items: center; gap: 6px; }
     .stat-value { color: var(--text-primary); font-weight: 800; }
     
-    .empty-state { text-align: center; padding: 30px 20px; color: var(--text-secondary); font-size: 13px; }
+    .empty-state { text-align: center; padding: 20px 16px; color: var(--text-secondary); font-size: 12px; } /* MINDRE PADDING/TEXT */
     .demo-notice {
       position: fixed;
       bottom: 10px;
       right: 10px;
-      font-size: 9px;
-      color: rgba(255,255,255,0.3);
+      font-size: 8px; /* MINDRE TEXT */
+      color: rgba(255,255,255,0.2);
       background: rgba(0,0,0,0.5);
       padding: 4px 8px;
       border-radius: 4px;
