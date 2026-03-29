@@ -47,7 +47,10 @@ Kontakta för:
 - **Custom anpassning**
 - **Support & installation**
 
-**Kontakt:** [Din e-post eller kontaktsätt]
+**Kontakt:** <!-- Direktmeddelande till dig -->
+<a href="https://discord.com/users/164845871278718978" target="_blank">
+  📩 Skicka DM på Discord
+</a>
 
 ---
 
