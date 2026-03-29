@@ -1,859 +1,185 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Don's TCG - Live Rip n Ship | Pokémon Cards</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            --bg-primary: #050505;
-            --bg-secondary: #0a0a0a;
-            --bg-card: #111111;
-            --bg-hover: #1a1a1a;
-            --text-primary: #ffffff;
-            --text-secondary: #888888;
-            --text-muted: #555555;
-            --border: #222222;
-            --border-hover: #333333;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --live: #ef4444;
-            --success: #22c55e;
-            --shopify: #95bf47;
-            --gradient-1: #3b82f6;
-            --gradient-2: #8b5cf6;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        
-        /* Navigation */
-        .nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(5, 5, 5, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 24px;
-        }
-        
-        .nav-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-        
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 32px;
-            align-items: center;
-        }
-        
-        .nav-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        
-        .nav-link:hover {
-            color: var(--text-primary);
-        }
-        
-        .live-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 100px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--live);
-            animation: pulse-border 2s infinite;
-        }
-        
-        @keyframes pulse-border {
-            0%, 100% { border-color: rgba(239, 68, 68, 0.3); }
-            50% { border-color: rgba(239, 68, 68, 0.6); }
-        }
-        
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--live);
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
-        }
-        
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 120px 24px 80px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
-            pointer-events: none;
-        }
-        
-        .hero-content {
-            max-width: 900px;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 100px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-        }
-        
-        .hero h1 {
-            font-size: clamp(48px, 10vw, 80px);
-            font-weight: 800;
-            letter-spacing: -3px;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, #ffffff 0%, #888888 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .hero p {
-            font-size: 20px;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 40px;
-        }
-        
-        .hero-cta {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px 32px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
-            color: white;
-            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.4);
-        }
-        
-        .btn-secondary {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--bg-hover);
-            border-color: var(--border-hover);
-        }
-        
-        /* Live Queue Preview */
-        .queue-preview {
-            margin-top: 60px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 32px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .queue-preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .queue-preview-title {
-            font-size: 16px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .queue-status {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-        
-        .queue-list-preview {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .queue-item-preview {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            background: var(--bg-primary);
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-        
-        .queue-position {
-            width: 28px;
-            height: 28px;
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid var(--accent);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--accent);
-        }
-        
-        .queue-item-info {
-            flex: 1;
-            text-align: left;
-        }
-        
-        .queue-item-name {
-            font-size: 14px;
-            font-weight: 600;
-        }
-        
-        .queue-item-product {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-        
-        .queue-item-status {
-            font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 100px;
-            font-weight: 600;
-        }
-        
-        .status-waiting {
-            background: rgba(245, 158, 11, 0.1);
-            color: #f59e0b;
-        }
-        
-        .status-live {
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--success);
-        }
-        
-        /* Products Section */
-        .products {
-            padding: 100px 24px;
-            background: var(--bg-secondary);
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .section-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-        
-        .section-label {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--accent);
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-        
-        .section-title {
-            font-size: clamp(32px, 5vw, 48px);
-            font-weight: 800;
-            letter-spacing: -1px;
-            margin-bottom: 16px;
-        }
-        
-        .section-subtitle {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 24px;
-        }
-        
-        .product-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-hover);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-        
-        .product-image {
-            aspect-ratio: 4/3;
-            background: linear-gradient(135deg, var(--bg-hover) 0%, var(--bg-card) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 80px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .product-image::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent 0%, rgba(59, 130, 246, 0.1) 100%);
-        }
-        
-        .product-badge {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            padding: 6px 12px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        .product-info {
-            padding: 24px;
-        }
-        
-        .product-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .product-description {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-            line-height: 1.5;
-        }
-        
-        .product-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .product-price {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--text-primary);
-        }
-        
-        .product-price span {
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        
-        .btn-buy {
-            padding: 12px 24px;
-            background: var(--shopify);
-            color: #000;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-buy:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(149, 191, 71, 0.3);
-        }
-        
-        /* How It Works */
-        .how-it-works {
-            padding: 100px 24px;
-        }
-        
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 32px;
-            margin-top: 60px;
-        }
-        
-        .step {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 40px 32px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .step-number {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 800;
-            margin: 0 auto 24px;
-        }
-        
-        .step h3 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-        
-        .step p {
-            font-size: 15px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-        
-        /* Footer */
-        .footer {
-            padding: 60px 24px;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border);
-            text-align: center;
-        }
-        
-        .footer-links {
-            display: flex;
-            gap: 32px;
-            justify-content: center;
-            margin-bottom: 24px;
-        }
-        
-        .footer-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s;
-        }
-        
-        .footer-link:hover {
-            color: var(--text-primary);
-        }
-        
-        .footer-copy {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-        
-        /* Admin Access */
-        .admin-access {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 100;
-        }
-        
-        .admin-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 100px;
-            color: var(--text-secondary);
-            font-size: 13px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-        
-        .admin-btn:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-            border-color: var(--border-hover);
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .hero-cta {
-                flex-direction: column;
-                width: 100%;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Don's TCG - Demo</title>
+  <style>
+    /* Samma CSS som tidigare */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-primary: #050505;
+      --bg-secondary: #0a0a0a;
+      --bg-card: #111111;
+      --text-primary: #ffffff;
+      --text-secondary: #888888;
+      --border: #222222;
+      --accent: #3b82f6;
+      --live: #ef4444;
+      --success: #22c55e;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: rgba(5,5,5,0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      z-index: 1000;
+    }
+    .nav-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 24px 80px;
+      text-align: center;
+    }
+    .hero-content { max-width: 900px; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+    .hero h1 {
+      font-size: clamp(48px, 10vw, 80px);
+      font-weight: 800;
+      letter-spacing: -3px;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #fff, #888);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 20px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      color: white;
+      margin-right: 16px;
+    }
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    .demo-notice {
+      margin-top: 60px;
+      padding: 24px;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 16px;
+      color: #f59e0b;
+    }
+    .demo-notice h3 {
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+    .demo-notice p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #fbbf24;
+    }
+    .demo-notice a {
+      color: #fbbf24;
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="nav">
-        <div class="nav-content">
-            <div class="logo">
-                <div class="logo-icon">🎴</div>
-                <span>Don's TCG</span>
-            </div>
-            <div class="nav-links">
-                <a href="#products" class="nav-link">Produkter</a>
-                <a href="#how-it-works" class="nav-link">Så funkar det</a>
-                <a href="admin/" class="nav-link">Admin</a>
-                <a href="overlay/queue.html" target="_blank" class="nav-link">Overlay</a>
-                <div class="live-badge">
-                    <span class="live-dot"></span>
-                    LIVE
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <span>🔥</span>
-                Live Rip n Ship
-            </div>
-            <h1>Live Rip n Ship</h1>
-            <p>Köp Pokémon-kort och se dem öppnas live på stream! Dina kort skickas direkt till dig efter opening.</p>
-            <div class="hero-cta">
-                <a href="#products" class="btn btn-primary">
-                    <span>🛒</span>
-                    Köp nu
-                </a>
-                <a href="https://twitch.tv/donstcg" target="_blank" class="btn btn-secondary">
-                    <span>📺</span>
-                    Titta live
-                </a>
-            </div>
-            
-            <!-- Live Queue Preview -->
-            <div class="queue-preview">
-                <div class="queue-preview-header">
-                    <div class="queue-preview-title">
-                        <span>📋</span>
-                        Live Kö
-                    </div>
-                    <div class="queue-status" id="queue-status">Uppdateras...</div>
-                </div>
-                <div class="queue-list-preview" id="queue-preview-list">
-                    <div class="queue-item-preview">
-                        <div class="queue-position">1</div>
-                        <div class="queue-item-info">
-                            <div class="queue-item-name">@AnnaPokemon</div>
-                            <div class="queue-item-product">Lost Origin Booster Box</div>
-                        </div>
-                        <span class="queue-item-status status-live">LIVE</span>
-                    </div>
-                    <div class="queue-item-preview">
-                        <div class="queue-position">2</div>
-                        <div class="queue-item-info">
-                            <div class="queue-item-name">@MikaelTCG</div>
-                            <div class="queue-item-product">Brilliant Stars ETB</div>
-                        </div>
-                        <span class="queue-item-status status-waiting">Väntar</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Products Section -->
-    <section class="products" id="products">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-label">Produkter</div>
-                <h2 class="section-title">Välj dina paket</h2>
-                <p class="section-subtitle">Alla paket öppnas live på stream och skickas direkt till dig med tracking.</p>
-            </div>
-            
-            <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-image">
-                        <span>📦</span>
-                        <span class="product-badge">Populär</span>
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Lost Origin Booster Box</h3>
-                        <p class="product-description">36 booster packs med chans på Giratina VSTAR och andra chase cards. Öppnas live på stream!</p>
-                        <div class="product-footer">
-                            <div class="product-price">1 199 <span>kr</span></div>
-                            <button class="btn-buy" onclick="buyProduct('Lost Origin Booster Box', 1199)">Köp nu</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="product-card">
-                    <div class="product-image">
-                        <span>🎁</span>
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Brilliant Stars ETB</h3>
-                        <p class="product-description">Elite Trainer Box med 8 booster packs, sleeves, dividers och mer. Perfekt för samlingen!</p>
-                        <div class="product-footer">
-                            <div class="product-price">449 <span>kr</span></div>
-                            <button class="btn-buy" onclick="buyProduct('Brilliant Stars ETB', 449)">Köp nu</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="product-card">
-                    <div class="product-image">
-                        <span>🃏</span>
-                        <span class="product-badge">Budget</span>
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Single Booster Pack</h3>
-                        <p class="product-description">Enstaka booster pack. Perfekt för att testa lyckan utan att spendera för mycket!</p>
-                        <div class="product-footer">
-                            <div class="product-price">45 <span>kr</span></div>
-                            <button class="btn-buy" onclick="buyProduct('Single Booster Pack', 45)">Köp nu</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="how-it-works" id="how-it-works">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-label">Processen</div>
-                <h2 class="section-title">Så funkar det</h2>
-                <p class="section-subtitle">Tre enkla steg från köp till dina kort i handen.</p>
-            </div>
-            
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3>Köp paket</h3>
-                    <p>Välj vilka produkter du vill ha och betala säkert via Shopify. Du får direkt en bekräftelse.</p>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3>Se live opening</h3>
-                    <p>Din order hamnar i kön. Du ser exakt när det är din tur på stream och vilka kort du får!</p>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3>Få dina kort</h3>
-                    <p>Efter opening packas dina kort säkert och skickas med spårbar frakt direkt till dig.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-links">
-            <a href="https://twitch.tv/donstcg" target="_blank" class="footer-link">Twitch</a>
-            <a href="#" class="footer-link">Discord</a>
-            <a href="#" class="footer-link">Instagram</a>
-            <a href="mailto:don@donstcg.com" class="footer-link">Kontakt</a>
-        </div>
-        <p class="footer-copy">© 2024 Don's TCG. Alla rättigheter förbehållna.</p>
-    </footer>
-
-    <!-- Admin Access -->
-    <div class="admin-access">
-        <a href="admin/" class="admin-btn">
-            <span>⚙️</span>
-            Admin
-        </a>
+  <nav class="nav">
+    <div class="nav-content">
+      <div class="logo">
+        <div class="logo-icon">🎴</div>
+        <span>Don's TCG</span>
+      </div>
+      <div>
+        <a href="admin/" style="color: var(--text-secondary); text-decoration: none; font-size: 14px; margin-right: 20px;">Admin</a>
+        <a href="overlay/" target="_blank" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;">Overlay</a>
+      </div>
     </div>
+  </nav>
 
-    <!-- Scripts -->
-    <script>
-        // Köp-funktion som lägger till i kö-systemet
-        function buyProduct(productName, price) {
-            const username = prompt('Ange ditt Twitch-namn eller email för att komma i kö:');
-            if (!username) return;
-            
-            // Lägg till i waiting queue
-            let waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
-            waitingQueue.push({
-                id: Date.now(),
-                username: username.startsWith('@') ? username : '@' + username,
-                product: productName,
-                price: price,
-                timestamp: Date.now(),
-                source: 'website'
-            });
-            
-            localStorage.setItem('tcg_waiting_queue', JSON.stringify(waitingQueue));
-            localStorage.setItem('tcg_sync_trigger', Date.now().toString());
-            
-            // Uppdatera preview
-            updateQueuePreview();
-            
-            alert(`✅ ${productName} har lagts till i kön!\n\nDu är #${waitingQueue.length} i kön. Håll koll på streamen för att se när det är din tur!`);
-        }
-        
-        // Uppdatera kö-preview i realtid
-        function updateQueuePreview() {
-            const waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
-            const currentOrder = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
-            const queueList = document.getElementById('queue-preview-list');
-            const queueStatus = document.getElementById('queue-status');
-            
-            if (waitingQueue.length === 0 && !currentOrder) {
-                queueList.innerHTML = '<div style="color: var(--text-secondary); padding: 20px;">Ingen kö just nu</div>';
-                queueStatus.textContent = 'Tomt';
-                return;
-            }
-            
-            let html = '';
-            
-            // Visa nuvarande order först
-            if (currentOrder) {
-                html += `
-                    <div class="queue-item-preview">
-                        <div class="queue-position" style="background: rgba(34, 197, 94, 0.2); border-color: #22c55e; color: #22c55e;">●</div>
-                        <div class="queue-item-info">
-                            <div class="queue-item-name">${currentOrder.username}</div>
-                            <div class="queue-item-product">${currentOrder.product}</div>
-                        </div>
-                        <span class="queue-item-status status-live">LIVE NU</span>
-                    </div>
-                `;
-            }
-            
-            // Visa nästa 2 i kön
-            waitingQueue.slice(0, 2).forEach((order, index) => {
-                html += `
-                    <div class="queue-item-preview">
-                        <div class="queue-position">${index + 1}</div>
-                        <div class="queue-item-info">
-                            <div class="queue-item-name">${order.username}</div>
-                            <div class="queue-item-product">${order.product}</div>
-                        </div>
-                        <span class="queue-item-status status-waiting">Väntar</span>
-                    </div>
-                `;
-            });
-            
-            queueList.innerHTML = html;
-            queueStatus.textContent = `${waitingQueue.length + (currentOrder ? 1 : 0)} i kö`;
-        }
-        
-        // Lyssna på ändringar från andra flikar
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'tcg_waiting_queue' || event.key === 'tcg_current_order' || event.key === 'tcg_sync_trigger') {
-                updateQueuePreview();
-            }
-        });
-        
-        // Polling för uppdateringar
-        setInterval(updateQueuePreview, 3000);
-        
-        // Init
-        updateQueuePreview();
-    </script>
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span>🔥</span> Live Rip n Ship
+      </div>
+      <h1>Live Rip n Ship</h1>
+      <p>Köp Pokémon-kort och se dem öppnas live på stream! Dina kort skickas direkt till dig efter opening.</p>
+      
+      <div>
+        <button class="btn btn-primary" onclick="alert('Detta är en demo. I fullversionen kopplas detta till din Shopify-butik.')">
+          🛒 Köp nu (Demo)
+        </button>
+        <a href="https://twitch.tv/donstcg" target="_blank" class="btn btn-secondary">
+          📺 Titta live
+        </a>
+      </div>
+
+      <div class="demo-notice">
+        <h3>⚠️ Detta är en demo-version</h3>
+        <p>
+          Vad du ser här är en förhandsvisning av hur systemet fungerar. 
+          Alla "köp" sparas endast lokalt i din webbläsare och försvinner om du laddar om sidan.<br><br>
+          <strong>Fullversionen inkluderar:</strong><br>
+          • Koppling till din riktiga Shopify-butik<br>
+          • Automatiska ordrar från köp<br>
+          • Permanent lagring av kön<br>
+          • Admin-panel för att styra allt<br>
+          • OBS-overlay för din stream<br><br>
+          <a href="admin/">Testa admin-panelen →</a>
+        </p>
+      </div>
+    </div>
+  </section>
 </body>
 </html>
