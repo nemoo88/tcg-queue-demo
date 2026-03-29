@@ -271,4 +271,225 @@
           </div>
           <div class="form-group">
             <label class="form-label">Produkt</label>
-            <input type="text" class="form-input" id="input
+            <input type="text" class="form-input" id="input-product" placeholder="t.ex. Lost Origin Booster Box" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pris (kr)</label>
+            <input type="number" class="form-input" id="input-price" placeholder="0" min="0">
+          </div>
+          <button type="submit" class="btn-primary">+ Lägg till i kö</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Snabbval (Demo)</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button class="btn btn-secondary" onclick="quickAdd('Lost Origin Booster Box', 1199)" style="text-align: left;">📦 Booster Box — 1 199 kr</button>
+          <button class="btn btn-secondary" onclick="quickAdd('Brilliant Stars ETB', 449)" style="text-align: left;">🎁 ETB — 449 kr</button>
+          <button class="btn btn-secondary" onclick="quickAdd('Single Booster Pack', 45)" style="text-align: left;">🃏 Booster Pack — 45 kr</button>
+          <button class="btn btn-secondary" onclick="quickAdd('Duckrace Entry', 50)" style="text-align: left;">🦆 Duckrace — 50 kr (filtreras bort)</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Om fullversionen</div>
+        <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+          I den riktiga versionen:
+        </p>
+        <ul style="font-size: 13px; color: var(--text-secondary); line-height: 1.8; padding-left: 20px;">
+          <li>Ordrar kommer automatiskt från Shopify</li>
+          <li>Duckrace filtreras bort automatiskt</li>
+          <li>Data sparas permanent</li>
+          <li>Fungerar från vilken enhet som helst</li>
+          <li>OBS-overlay uppdateras i realtid</li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // 🦆 DUCKRACE - filtreras bort från kön
+    const DUCKRACE_KEYWORDS = ['duck', 'duckrace', 'anka', 'race', 'and', 'andrace'];
+
+    function isDuckrace(productName) {
+      const lower = productName.toLowerCase();
+      return DUCKRACE_KEYWORDS.some(keyword => lower.includes(keyword));
+    }
+
+    let waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
+    let currentOrder = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
+    let completed = parseInt(localStorage.getItem('tcg_completed')) || 0;
+    let revenue = parseInt(localStorage.getItem('tcg_revenue')) || 0;
+
+    function saveAll() {
+      localStorage.setItem('tcg_waiting_queue', JSON.stringify(waitingQueue));
+      localStorage.setItem('tcg_current_order', JSON.stringify(currentOrder));
+      localStorage.setItem('tcg_completed', completed);
+      localStorage.setItem('tcg_revenue', revenue);
+    }
+
+    function render() {
+      document.getElementById('stat-waiting').textContent = waitingQueue.length;
+      document.getElementById('stat-completed').textContent = completed;
+      document.getElementById('stat-time').textContent = (waitingQueue.length * 5) + ' min';
+      document.getElementById('stat-revenue').textContent = revenue.toLocaleString() + ' kr';
+      
+      document.getElementById('waiting-count').textContent = waitingQueue.length;
+      const waitingList = document.getElementById('waiting-list');
+      
+      if (waitingQueue.length === 0) {
+        waitingList.innerHTML = `
+          <div class="empty-state">
+            <p>Inga ordrar i kö.</p>
+            <p style="font-size: 13px; margin-top: 8px;">Lägg till en test-order med formuläret till höger →</p>
+          </div>
+        `;
+      } else {
+        waitingList.innerHTML = waitingQueue.map((order, index) => `
+          <div class="waiting-item">
+            <div class="queue-position">${index + 1}</div>
+            <div class="queue-info">
+              <div class="queue-username">${order.username}</div>
+              <div class="queue-product">${order.product}</div>
+            </div>
+            <span class="source-badge source-${order.source}">${order.source === 'demo' ? 'DEMO' : 'MANUELL'}</span>
+            <button class="btn-open" onclick="openOrder(${index})">ÖPPNA</button>
+          </div>
+        `).join('');
+      }
+      
+      const currentSection = document.getElementById('current-section');
+      const currentOrderDiv = document.getElementById('current-order');
+      const currentStatus = document.getElementById('current-status');
+      
+      if (currentOrder) {
+        currentSection.classList.remove('inactive');
+        currentSection.style.borderColor = 'var(--success)';
+        currentStatus.textContent = 'LIVE NU';
+        currentOrderDiv.style.display = 'block';
+        document.getElementById('current-user').textContent = currentOrder.username;
+        document.getElementById('current-product').textContent = currentOrder.product;
+      } else {
+        currentSection.classList.add('inactive');
+        currentSection.style.borderColor = 'var(--border)';
+        currentStatus.textContent = 'Ingen order öppnas';
+        currentOrderDiv.style.display = 'none';
+      }
+      
+      saveAll();
+    }
+
+    function addOrder(e) {
+      e.preventDefault();
+      const username = document.getElementById('input-username').value;
+      const product = document.getElementById('input-product').value;
+      const price = parseInt(document.getElementById('input-price').value) || 0;
+
+      // 🦆 Kolla om det är Duckrace
+      if (isDuckrace(product)) {
+        alert(`🦆 "${product}" är en Duckrace-produkt och läggs inte i Rip n Ship-kön.\n\nI fullversionen hanteras dessa separat.`);
+        // I demo: lägg till ändå men markera som duckrace
+        waitingQueue.push({
+          id: Date.now(),
+          username: username.startsWith('@') ? username : '@' + username,
+          product: product + ' [DUCKRACE]',
+          price: price,
+          timestamp: Date.now(),
+          source: 'demo'
+        });
+      } else {
+        waitingQueue.push({
+          id: Date.now(),
+          username: username.startsWith('@') ? username : '@' + username,
+          product: product,
+          price: price,
+          timestamp: Date.now(),
+          source: 'demo'
+        });
+      }
+      
+      document.getElementById('add-form').reset();
+      render();
+    }
+
+    function quickAdd(product, price) {
+      const username = prompt('Användarnamn:');
+      if (!username) return;
+      
+      const cleanUsername = username.startsWith('@') ? username : '@' + username;
+      
+      if (isDuckrace(product)) {
+        alert(`🦆 "${product}" är en Duckrace-produkt och läggs inte i Rip n Ship-kön.\n\nI fullversionen hanteras dessa separat.`);
+        waitingQueue.push({
+          id: Date.now(),
+          username: cleanUsername,
+          product: product + ' [DUCKRACE]',
+          price: price,
+          timestamp: Date.now(),
+          source: 'demo'
+        });
+      } else {
+        waitingQueue.push({
+          id: Date.now(),
+          username: cleanUsername,
+          product: product,
+          price: price,
+          timestamp: Date.now(),
+          source: 'demo'
+        });
+      }
+      
+      render();
+    }
+
+    function openOrder(index) {
+      if (currentOrder) {
+        alert('Du har redan en order som öppnas! Markera den som klar först.');
+        return;
+      }
+      
+      currentOrder = waitingQueue.splice(index, 1)[0];
+      render();
+    }
+
+    function completeCurrent() {
+      if (!currentOrder) return;
+      
+      revenue += currentOrder.price || 0;
+      completed++;
+      currentOrder = null;
+      
+      if (waitingQueue.length > 0) {
+        currentOrder = waitingQueue.shift();
+      }
+      
+      render();
+    }
+
+    function skipCurrent() {
+      if (!currentOrder) return;
+      
+      waitingQueue.push(currentOrder);
+      currentOrder = null;
+      
+      if (waitingQueue.length > 0) {
+        currentOrder = waitingQueue.shift();
+      }
+      
+      render();
+    }
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'tcg_waiting_queue' || event.key === 'tcg_current_order') {
+        waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
+        currentOrder = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
+        completed = parseInt(localStorage.getItem('tcg_completed')) || 0;
+        revenue = parseInt(localStorage.getItem('tcg_revenue')) || 0;
+        render();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
