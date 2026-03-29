@@ -46,13 +46,7 @@ Kontakta för:
 - **Custom anpassning**
 - **Support & installation**
 
-**Kontakt:** Discord
-
----
-
-## 📸 Screenshots
-
-*[Lägg till screenshots här]*
+**Kontakt:** discord Nemoo88
 
 ---
 
