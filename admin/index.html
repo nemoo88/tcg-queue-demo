@@ -2,627 +2,237 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <title>Admin - TCG Queue System (Demo)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TCG Queue Admin</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --bg-primary: #050505;
-      --bg-secondary: #0a0a0a;
-      --bg-card: #111111;
-      --text-primary: #ffffff;
-      --text-secondary: #888888;
-      --border: #222222;
-      --accent: #3b82f6;
-      --success: #22c55e;
-      --live: #ef4444;
-      --warning: #f59e0b;
-      --event: #ff6b9d;
+      --bg-primary: #0a0a0a; --bg-secondary: #111; --bg-card: #1a1a1a;
+      --bg-hover: #222; --text-primary: #fff; --text-secondary: #888;
+      --text-muted: #555; --border: #2a2a2a; --accent: #3b82f6;
+      --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
     }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-    }
-    .header {
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .logo { font-size: 20px; font-weight: 800; }
-    .main {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 24px;
-      display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 24px;
-    }
-    @media (max-width: 1024px) { .main { grid-template-columns: 1fr; } }
-    
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-    
-    .stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-    }
-    .stat-label { 
-      font-size: 12px; 
-      color: var(--text-secondary); 
-      text-transform: uppercase; 
-      letter-spacing: 1px; 
-      margin-bottom: 8px; 
-      font-weight: 600; 
-    }
-    .stat-value { font-size: 32px; font-weight: 800; }
-    
-    .demo-banner {
-      background: rgba(245, 158, 11, 0.1);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 24px;
-      color: #fbbf24;
-      font-size: 14px;
-    }
-    
-    .current-section {
-      background: var(--bg-card);
-      border: 2px solid var(--success);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-    .current-section.inactive {
-      border-color: var(--border);
-      border-style: dashed;
-      opacity: 0.6;
-    }
-    .current-section.event {
-      border-color: var(--event);
-    }
-    .section-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .current-order {
-      background: var(--bg-primary);
-      border-radius: 16px;
-      padding: 32px;
-      text-align: center;
-    }
-    .current-label { 
-      font-size: 12px; 
-      color: var(--text-secondary); 
-      text-transform: uppercase; 
-      letter-spacing: 1px; 
-      margin-bottom: 16px; 
-    }
-    .current-user { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
-    .current-product { font-size: 18px; color: var(--text-secondary); margin-bottom: 24px; }
-    
-    .btn {
-      padding: 14px 28px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      border: none;
-      margin-right: 8px;
-    }
-    .btn-success { background: var(--success); color: white; }
-    .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); }
-    .btn-event { background: var(--event); color: white; }
-    
-    .waiting-section {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-    }
-    .waiting-list { 
-      display: flex; 
-      flex-direction: column; 
-      gap: 8px; 
-    }
-    .waiting-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: var(--bg-primary);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-    }
-    .waiting-item.event {
-      border-color: var(--event);
-      background: rgba(255, 107, 157, 0.05);
-    }
-    .queue-position {
-      width: 36px; height: 36px;
-      background: rgba(59, 130, 246, 0.2);
-      border: 1px solid var(--accent);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      color: var(--accent);
-      flex-shrink: 0;
-    }
-    .queue-position.event {
-      background: rgba(255, 107, 157, 0.2);
-      border-color: var(--event);
-      color: var(--event);
-    }
-    .queue-info { 
-      flex: 1; 
-      min-width: 0;
-      overflow: hidden;
-    }
-    .queue-username { 
-      font-weight: 700; 
-      font-size: 15px;
-      margin-bottom: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .queue-product { 
-      font-size: 13px;
-      color: var(--text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .queue-note { 
-      font-size: 11px;
-      color: var(--text-secondary); 
-      font-style: italic; 
-      margin-top: 2px;
-    }
-    .btn-open {
-      padding: 10px 20px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .btn-open.event {
-      background: var(--event);
-    }
-    .source-badge {
-      font-size: 10px;
-      padding: 4px 10px;
-      border-radius: 100px;
-      font-weight: 700;
-      text-transform: uppercase;
-      flex-shrink: 0;
-    }
-    .source-demo { background: var(--warning); color: #000; }
-    .source-manual { background: var(--text-secondary); color: #000; }
-    .source-event { background: var(--event); color: #fff; }
-    
-    .sidebar { display: flex; flex-direction: column; gap: 24px; }
-    .panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-    }
-    .panel-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
-    .form-group { margin-bottom: 16px; }
-    .form-label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
-    .form-input, .form-textarea {
-      width: 100%;
-      padding: 14px 16px;
-      background: var(--bg-primary);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text-primary);
-      font-size: 15px;
-      font-family: inherit;
-    }
-    .form-textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-    .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--accent); }
-    .form-hint {
-      font-size: 11px;
-      color: var(--text-secondary);
-      margin-top: 4px;
-      font-style: italic;
-    }
-    .btn-primary {
-      width: 100%;
-      padding: 14px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .btn-event-add {
-      width: 100%;
-      padding: 14px;
-      background: var(--event);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 12px;
-    }
-    
-    .empty-state { text-align: center; padding: 40px; color: var(--text-secondary); }
+    body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+    .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .logo { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
+    .logo-icon { font-size: 24px; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 14px; }
+    .nav-link:hover { color: var(--text-primary); }
+    .status-badge { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.3); color: var(--success); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
+    @media(max-width:1024px){.container{grid-template-columns:1fr}}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+    .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px}
+    .stat-label{font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:8px}
+    .stat-value{font-size:32px;font-weight:800}
+    .blue{color:var(--accent)}.green{color:var(--success)}.orange{color:var(--warning)}
+    .current-section{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center}
+    .current-label{font-size:14px;color:var(--text-secondary);font-weight:600}
+    .current-empty{font-size:13px;color:var(--text-muted)}
+    .queue-section{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .queue-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .queue-title{font-size:16px;font-weight:700}.queue-count{font-size:13px;color:var(--text-secondary)}
+    .queue-list{padding:16px}.queue-item{display:flex;align-items:center;gap:16px;padding:16px;background:var(--bg-primary);border:1px solid var(--border);border-radius:10px;margin-bottom:12px}
+    .queue-num{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
+    .queue-info{flex:1}.queue-user{font-size:15px;font-weight:700;margin-bottom:2px}.queue-product{font-size:13px;color:var(--text-secondary)}
+    .queue-price{font-size:13px;color:var(--warning);margin-top:4px}
+    .badge{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;background:var(--bg-hover);color:var(--text-secondary)}
+    .btn{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+    .btn-primary{background:var(--accent);color:white}.btn-primary:hover{background:#2563eb}
+    .btn-secondary{background:var(--bg-hover);color:var(--text-primary);border:1px solid var(--border)}
+    .btn-success{background:var(--success);color:black}.btn-danger{background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.3)}
+    .btn-small{padding:6px 12px;font-size:11px}.btn-full{width:100%;padding:14px;font-size:14px;margin-top:8px}
+    .sidebar{display:flex;flex-direction:column;gap:16px}
+    .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px}
+    .panel-title{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+    .form-group{margin-bottom:14px}.form-label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px}
+    .form-input{width:100%;padding:12px;background:var(--bg-primary);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-size:14px}
+    .form-input:focus{outline:none;border-color:var(--accent)}
+    .form-row{display:grid;grid-template-columns:2fr 1fr;gap:8px}
+    .quick-grid{display:flex;flex-direction:column;gap:8px}
+    .quick-item{display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg-primary);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;position:relative}
+    .quick-item:hover{background:var(--bg-hover);border-color:var(--accent)}.quick-item:hover .quick-delete{display:flex}
+    .quick-icon{font-size:16px}.quick-info{flex:1}.quick-name{font-weight:600}.quick-price{color:var(--text-secondary);font-size:12px}
+    .quick-item.event{background:linear-gradient(135deg,rgba(59,130,246,.1),transparent);border-color:var(--accent)}
+    .quick-delete{display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);width:20px;height:20px;background:var(--danger);border-radius:4px;align-items:center;justify-content:center;font-size:12px;color:white;cursor:pointer}
+    .add-quick-form{background:var(--bg-primary);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:12px}
+    .empty-state{text-align:center;padding:40px;color:var(--text-muted)}
+    .hidden{display:none!important}.section-hint{font-size:11px;color:var(--text-muted);margin-top:-12px;margin-bottom:12px}
   </style>
 </head>
 <body>
   <header class="header">
-    <div class="logo">🎴 TCG Queue Admin (Demo)</div>
-    <div>
-      <a href="../" style="color: var(--text-secondary); text-decoration: none; margin-right: 16px;">Hemsida</a>
-      <a href="../overlay/" target="_blank" style="color: var(--text-secondary); text-decoration: none;">Overlay</a>
-    </div>
+    <div class="logo"><span class="logo-icon">🎴</span><span>TCG Queue Admin</span></div>
+    <nav class="nav-links">
+      <a href="/" class="nav-link">Hemsida</a>
+      <a href="/overlay/" target="_blank" class="nav-link">Overlay</a>
+      <span class="status-badge">● LIVE</span>
+    </nav>
   </header>
 
-  <div class="demo-banner">
-    ⚠️ <strong>Demo-läge:</strong> All data sparas endast i denna webbläsare och försvinner vid reload. 
-    I fullversionen kopplas detta till din butik med automatiska ordrar.
-  </div>
-
-  <main class="main">
-    <div class="content">
+  <div class="container">
+    <div class="main-content">
       <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Väntar (Rip n Ship)</div>
-          <div class="stat-value" id="stat-waiting">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Klara idag</div>
-          <div class="stat-value" style="color: var(--success);" id="stat-completed">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Est. tid</div>
-          <div class="stat-value" style="color: var(--warning);" id="stat-time">0 min</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Omsättning</div>
-          <div class="stat-value" id="stat-revenue">0 kr</div>
-        </div>
+        <div class="stat-card"><div class="stat-label">Väntar (Rip n Ship)</div><div class="stat-value blue" id="stat-waiting">0</div></div>
+        <div class="stat-card"><div class="stat-label">Klara idag</div><div class="stat-value green" id="stat-completed">0</div></div>
+        <div class="stat-card"><div class="stat-label">Est. tid</div><div class="stat-value orange" id="stat-est">0 min</div></div>
+        <div class="stat-card"><div class="stat-label">Omsättning</div><div class="stat-value" id="stat-revenue">0 kr</div></div>
       </div>
 
-      <div class="current-section inactive" id="current-section">
-        <div class="section-title">
-          <span>Nuvarande order</span>
-          <span id="current-status" style="color: var(--text-secondary); font-size: 13px;">Ingen order öppnas</span>
+      <div class="current-section" id="current-section">
+        <div>
+          <div class="current-label">Nuvarande order</div>
+          <div id="current-details" class="current-empty">Ingen order öppnas</div>
         </div>
-        <div class="current-order" id="current-order" style="display: none;">
-          <div class="current-label">Öppnar nu</div>
-          <div class="current-user" id="current-user">-</div>
-          <div class="current-product" id="current-product">-</div>
-          <div id="current-note" style="font-size: 14px; color: var(--text-secondary); margin-top: 8px; font-style: italic;"></div>
-          <div style="margin-top: 24px;">
-            <button class="btn btn-success" onclick="completeCurrent()">✓ Klar - Nästa</button>
-            <button class="btn btn-secondary" onclick="skipCurrent()">→ Skippa</button>
-          </div>
-        </div>
+        <button class="btn btn-success hidden" id="btn-complete">✓ Klar - Nästa</button>
       </div>
 
-      <div class="waiting-section">
-        <div class="section-title">
-          Kölista
-          <span style="font-size: 14px; color: var(--text-secondary);"><span id="waiting-count">0</span> ordrar</span>
-        </div>
-        <div class="waiting-list" id="waiting-list">
-          <div class="empty-state">
-            <p>Inga ordrar i kö.</p>
-            <p style="font-size: 13px; margin-top: 8px;">Lägg till med formuläret till höger →</p>
-          </div>
-        </div>
+      <div class="queue-section">
+        <div class="queue-header"><span class="queue-title">Kölista</span><span class="queue-count" id="queue-count">0 ordrar</span></div>
+        <div class="queue-list" id="queue-list"><div class="empty-state">Inga ordrar i kön</div></div>
       </div>
     </div>
 
-    <aside class="sidebar">
-      <!-- Rip n Ship Panel -->
-      <div class="panel" id="panel-ripship">
+    <div class="sidebar">
+      <div class="panel" id="ripship-panel">
         <div class="panel-title">Lägg till Rip n Ship</div>
-        <form id="add-form" onsubmit="addOrder(event, 'ripship')">
-          <div class="form-group">
-            <label class="form-label">Användarnamn / Twitch</label>
-            <input type="text" class="form-input" id="input-username" placeholder="t.ex. @Användare" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Produkt</label>
-            <input type="text" class="form-input" id="input-product" placeholder="t.ex. Booster Box" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Pris (kr)</label>
-            <input type="number" class="form-input" id="input-price" placeholder="0" min="0">
-          </div>
-          <button type="submit" class="btn-primary">+ Lägg till i kö</button>
-        </form>
-        <button class="btn-event-add" onclick="showEventPanel()">🎉 Lägg till Event istället</button>
+        <div class="form-group"><label class="form-label">Användarnamn / Twitch</label><input type="text" class="form-input" id="manual-username" placeholder="t.ex. @Användare"></div>
+        <div class="form-group"><label class="form-label">Produkt</label><input type="text" class="form-input" id="manual-product" placeholder="t.ex. Booster Box"></div>
+        <div class="form-group"><label class="form-label">Pris (kr)</label><input type="number" class="form-input" id="manual-price" placeholder="0"></div>
+        <button class="btn btn-primary btn-full" id="btn-add-ripship">+ Lägg till i kö</button>
+        <button class="btn btn-secondary btn-full" id="btn-toggle-event">🎉 Lägg till Event istället</button>
       </div>
 
-      <!-- Event Panel -->
-      <div class="panel" id="panel-event" style="display: none;">
+      <div class="panel hidden" id="event-panel">
         <div class="panel-title">Lägg till Event</div>
-        <form id="event-form" onsubmit="addOrder(event, 'event')">
-          <div class="form-group">
-            <label class="form-label">Event-typ</label>
-            <input type="text" class="form-input" id="event-name" placeholder="t.ex. Giveaway, Packbattle, Tournament" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Deltagare / Vem <span style="font-weight: 400; color: var(--text-secondary);">(valfritt)</span></label>
-            <input type="text" class="form-input" id="event-username" placeholder="t.ex. @Användare eller lämna tom">
-            <div class="form-hint">Lämna tom om flera deltar, blir automatiskt @alla</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Info / Antal / Nummer</label>
-            <input type="text" class="form-input" id="event-info" placeholder="t.ex. Entry #5, Team A, etc.">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Pris (kr) <span style="font-weight: 400; color: var(--text-secondary);">(valfritt)</span></label>
-            <input type="number" class="form-input" id="event-price" placeholder="0" min="0">
-            <div class="form-hint">Lämna 0 om gratis/event</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Anteckningar / Övrigt</label>
-            <textarea class="form-textarea" id="event-notes" placeholder="Valfri info..."></textarea>
-          </div>
-          <button type="submit" class="btn-event-add">🎉 Lägg till Event</button>
-        </form>
-        <button class="btn-primary" onclick="showRipShipPanel()" style="margin-top: 12px; background: var(--bg-secondary); color: var(--text-primary);">← Tillbaka till Rip n Ship</button>
+        <div class="form-group"><label class="form-label">Event-typ</label><input type="text" class="form-input" id="event-type" placeholder="t.ex. Giveaway, Duckrace..."></div>
+        <div class="form-group"><label class="form-label">Användarnamn</label><input type="text" class="form-input" id="event-username" placeholder="t.ex. @Användare"></div>
+        <div class="form-group"><label class="form-label">Intäkt (kr)</label><input type="number" class="form-input" id="event-price" placeholder="0"></div>
+        <button class="btn btn-primary btn-full" id="btn-add-event">+ Lägg till Event</button>
+        <button class="btn btn-secondary btn-full" id="btn-toggle-ripship">← Tillbaka till Rip n Ship</button>
       </div>
 
       <div class="panel">
-        <div class="panel-title">Snabbval</div>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <button class="btn btn-secondary" onclick="quickAdd('Booster Box', 1199, 'ripship')" style="text-align: left;">📦 Booster Box — 1 199 kr</button>
-          <button class="btn btn-secondary" onclick="quickAdd('Elite Trainer Box', 449, 'ripship')" style="text-align: left;">🎁 ETB — 449 kr</button>
-          <button class="btn btn-secondary" onclick="quickAdd('Booster Pack', 45, 'ripship')" style="text-align: left;">🃏 Booster Pack — 45 kr</button>
-          <button class="btn btn-event" onclick="quickAdd('Giveaway Entry', 0, 'event')" style="text-align: left;">🎉 Giveaway — 0 kr</button>
+        <div class="panel-title">Snabbval<button class="btn btn-small btn-secondary" id="btn-toggle-quick">+ Lägg till</button></div>
+        <div class="section-hint">Klicka för att lägga till i kö. Hovra för att ta bort.</div>
+        <div class="quick-grid" id="quick-list"></div>
+        <div class="add-quick-form hidden" id="add-quick-form">
+          <div class="form-group"><label class="form-label">Produktnamn</label><input type="text" class="form-input" id="quick-name" placeholder="t.ex. Elite Trainer Box"></div>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0"><label class="form-label">Pris (kr)</label><input type="number" class="form-input" id="quick-price" placeholder="0"></div>
+            <div class="form-group" style="margin-bottom:0"><label class="form-label">Ikon (emoji)</label><input type="text" class="form-input" id="quick-icon" placeholder="📦" maxlength="2"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn btn-primary" id="btn-save-quick" style="flex:1">Spara</button>
+            <button class="btn btn-secondary" id="btn-cancel-quick">Avbryt</button>
+          </div>
         </div>
       </div>
-    </aside>
-  </main>
+    </div>
+  </div>
 
   <script>
-    let waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
-    let currentOrder = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
-    let completed = parseInt(localStorage.getItem('tcg_completed')) || 0;
-    let revenue = parseInt(localStorage.getItem('tcg_revenue')) || 0;
-
-    function saveAll() {
-      localStorage.setItem('tcg_waiting_queue', JSON.stringify(waitingQueue));
-      localStorage.setItem('tcg_current_order', JSON.stringify(currentOrder));
-      localStorage.setItem('tcg_completed', completed);
-      localStorage.setItem('tcg_revenue', revenue);
-    }
-
-    function showEventPanel() {
-      document.getElementById('panel-ripship').style.display = 'none';
-      document.getElementById('panel-event').style.display = 'block';
-    }
-
-    function showRipShipPanel() {
-      document.getElementById('panel-event').style.display = 'none';
-      document.getElementById('panel-ripship').style.display = 'block';
-    }
-
+    var queue = [], currentOrder = null, completed = 0, revenue = 0, quickItems = [];
+    try {
+      var sq = localStorage.getItem('tcg_queue'), sc = localStorage.getItem('tcg_current'), sco = localStorage.getItem('tcg_completed'), sr = localStorage.getItem('tcg_revenue'), sqk = localStorage.getItem('tcg_quick_items');
+      if (sq) queue = JSON.parse(sq); if (sc) currentOrder = JSON.parse(sc); if (sco) completed = parseInt(sco); if (sr) revenue = parseInt(sr);
+      if (sqk) quickItems = JSON.parse(sqk); else quickItems = [{id:'1',name:'Booster Box',price:1199,icon:'📦',type:'ripship'},{id:'2',name:'ETB',price:449,icon:'🎁',type:'ripship'},{id:'3',name:'Booster Pack',price:45,icon:'🃏',type:'ripship'},{id:'4',name:'Giveaway',price:0,icon:'🎉',type:'event'}];
+    } catch(e) { quickItems = [{id:'1',name:'Booster Box',price:1199,icon:'📦',type:'ripship'},{id:'2',name:'ETB',price:449,icon:'🎁',type:'ripship'},{id:'3',name:'Booster Pack',price:45,icon:'🃏',type:'ripship'},{id:'4',name:'Giveaway',price:0,icon:'🎉',type:'event'}]; }
+    
     function render() {
-      const ripShipQueue = waitingQueue.filter(o => o.type === 'ripship');
-      const eventQueue = waitingQueue.filter(o => o.type === 'event');
-      
-      document.getElementById('stat-waiting').textContent = ripShipQueue.length;
+      var waiting = queue.filter(function(o){return o.status==='waiting'}), ripShipWaiting = waiting.filter(function(o){return o.type==='ripship'});
+      document.getElementById('stat-waiting').textContent = ripShipWaiting.length;
       document.getElementById('stat-completed').textContent = completed;
-      document.getElementById('stat-time').textContent = (ripShipQueue.length * 5) + ' min';
-      document.getElementById('stat-revenue').textContent = revenue.toLocaleString() + ' kr';
-      
-      document.getElementById('waiting-count').textContent = waitingQueue.length;
-      const waitingList = document.getElementById('waiting-list');
-      
-      if (waitingQueue.length === 0) {
-        waitingList.innerHTML = `
-          <div class="empty-state">
-            <p>Inga ordrar i kö.</p>
-            <p style="font-size: 13px; margin-top: 8px;">Lägg till med formuläret till höger →</p>
-          </div>
-        `;
-      } else {
-        waitingList.innerHTML = waitingQueue.map((order, index) => `
-          <div class="waiting-item ${order.type === 'event' ? 'event' : ''}">
-            <div class="queue-position ${order.type === 'event' ? 'event' : ''}">${index + 1}</div>
-            <div class="queue-info">
-              <div class="queue-username">${order.username || '@alla'}</div>
-              <div class="queue-product">${order.product}</div>
-              ${order.info ? `<div class="queue-note">📌 ${order.info}</div>` : ''}
-              ${order.notes ? `<div class="queue-note">📝 ${order.notes}</div>` : ''}
-              ${order.price > 0 ? `<div class="queue-note">💰 ${order.price} kr</div>` : ''}
-            </div>
-            <span class="source-badge source-${order.type === 'event' ? 'event' : order.source}">${order.type === 'event' ? '🎉' : order.source === 'demo' ? 'DEMO' : 'MANU'}</span>
-            <button class="btn-open ${order.type === 'event' ? 'event' : ''}" onclick="openOrder(${index})">ÖPPNA</button>
-          </div>
-        `).join('');
+      document.getElementById('stat-est').textContent = (ripShipWaiting.length*5)+' min';
+      document.getElementById('stat-revenue').textContent = revenue.toLocaleString()+' kr';
+      var cd = document.getElementById('current-details'), bc = document.getElementById('btn-complete');
+      if (currentOrder) { cd.innerHTML = '<div style="font-size:18px;font-weight:700">'+currentOrder.username+'</div><div style="font-size:14px;color:#888;margin-top:4px">'+currentOrder.product+'</div>'; bc.classList.remove('hidden'); }
+      else { cd.innerHTML = '<span class="current-empty">Ingen order öppnas</span>'; bc.classList.add('hidden'); }
+      document.getElementById('queue-count').textContent = waiting.length+' ordrar';
+      var ql = document.getElementById('queue-list');
+      if (waiting.length===0) { ql.innerHTML = '<div class="empty-state">Inga ordrar i kön</div>'; return; }
+      var html = '';
+      for (var i=0; i<waiting.length; i++) {
+        var o = waiting[i];
+        html += '<div class="queue-item"><div class="queue-num">'+(i+1)+'</div><div class="queue-info"><div class="queue-user">'+o.username+'</div><div class="queue-product">'+o.product+'</div>'+(o.price?'<div class="queue-price">💰 '+o.price+' kr</div>':'')+'</div><div class="queue-actions">'+(o.source==='manual'?'<span class="badge">Manuell</span>':'')+'<button class="btn btn-primary" data-oid="'+o.id+'">ÖPPNA</button></div></div>';
       }
-      
-      const currentSection = document.getElementById('current-section');
-      const currentOrderDiv = document.getElementById('current-order');
-      const currentStatus = document.getElementById('current-status');
-      
-      if (currentOrder) {
-        currentSection.classList.remove('inactive');
-        currentSection.classList.toggle('event', currentOrder.type === 'event');
-        currentStatus.textContent = currentOrder.type === 'event' ? '🎉 EVENT' : 'LIVE NU';
-        currentOrderDiv.style.display = 'block';
-        document.getElementById('current-user').textContent = currentOrder.username || '@alla';
-        document.getElementById('current-product').textContent = currentOrder.product;
-        document.getElementById('current-note').textContent = 
-          (currentOrder.info ? `📌 ${currentOrder.info} ` : '') + 
-          (currentOrder.notes ? `📝 ${currentOrder.notes}` : '') +
-          (currentOrder.price > 0 ? ` 💰 ${currentOrder.price} kr` : '');
-      } else {
-        currentSection.classList.add('inactive');
-        currentSection.classList.remove('event');
-        currentStatus.textContent = 'Ingen order öppnas';
-        currentOrderDiv.style.display = 'none';
-      }
-      
-      saveAll();
+      ql.innerHTML = html;
+      var btns = ql.querySelectorAll('.btn-primary');
+      for (var j=0; j<btns.length; j++) btns[j].addEventListener('click', function(e){openOrder(e.target.getAttribute('data-oid'));});
     }
-
-    function addOrder(e, type) {
-      e.preventDefault();
-      
-      let username, product, price, info, notes;
-      
-      if (type === 'event') {
-        const eventName = document.getElementById('event-name').value;
-        const usernameInput = document.getElementById('event-username').value.trim();
-        username = usernameInput ? (usernameInput.startsWith('@') ? usernameInput : '@' + usernameInput) : '@alla';
-        info = document.getElementById('event-info').value;
-        notes = document.getElementById('event-notes').value;
-        price = parseInt(document.getElementById('event-price').value) || 0;
-        product = eventName;
-      } else {
-        username = document.getElementById('input-username').value;
-        product = document.getElementById('input-product').value;
-        price = parseInt(document.getElementById('input-price').value) || 0;
+    
+    function renderQuickItems() {
+      var c = document.getElementById('quick-list');
+      if (quickItems.length===0) { c.innerHTML = '<div class="empty-state" style="padding:20px">Inga snabbval. Lägg till ovan.</div>'; return; }
+      var html = '';
+      for (var i=0; i<quickItems.length; i++) {
+        var it = quickItems[i], ev = it.type==='event';
+        html += '<div class="quick-item '+(ev?'event':'')+'" data-qid="'+it.id+'"><span class="quick-icon">'+(it.icon||'📦')+'</span><div class="quick-info"><div class="quick-name">'+it.name+'</div><div class="quick-price">'+it.price.toLocaleString()+' kr</div></div><div class="quick-delete" data-did="'+it.id+'">×</div></div>';
       }
-      
-      const order = {
-        id: Date.now(),
-        username: username,
-        product: product,
-        price: price,
-        type: type,
-        info: info || null,
-        notes: notes || null,
-        timestamp: Date.now(),
-        source: 'manual'
-      };
-      
-      waitingQueue.push(order);
-      
-      if (type === 'event') {
-        document.getElementById('event-form').reset();
-      } else {
-        document.getElementById('add-form').reset();
-      }
-      
-      render();
+      c.innerHTML = html;
+      var its = c.querySelectorAll('.quick-item');
+      for (var j=0; j<its.length; j++) its[j].addEventListener('click', function(e){if(e.target.classList.contains('quick-delete'))return;useQuickItem(e.currentTarget.getAttribute('data-qid'));});
+      var dels = c.querySelectorAll('.quick-delete');
+      for (var k=0; k<dels.length; k++) dels[k].addEventListener('click', function(e){e.stopPropagation();deleteQuickItem(e.target.getAttribute('data-did'));});
     }
-
-    function quickAdd(product, price, type) {
-      if (type === 'event') {
-        const eventName = prompt('Event-typ: (t.ex. Giveaway, Packbattle, Tournament)') || 'Event';
-        const usernameInput = prompt('Deltagare / Vem (tryck OK för att hoppa över):') || '';
-        const info = prompt('Info / Antal / Nummer:') || '';
-        const notes = prompt('Anteckningar (valfritt):') || '';
-        const priceInput = prompt('Pris (kr) - lämna tom för 0:') || '0';
-        const eventPrice = parseInt(priceInput) || 0;
-        
-        waitingQueue.push({
-          id: Date.now(),
-          username: usernameInput ? (usernameInput.startsWith('@') ? usernameInput : '@' + usernameInput) : '@alla',
-          product: eventName,
-          price: eventPrice,
-          type: 'event',
-          info: info,
-          notes: notes,
-          timestamp: Date.now(),
-          source: 'manual'
-        });
-      } else {
-        const username = prompt('Användarnamn / Twitch:');
-        if (!username) return;
-        
-        waitingQueue.push({
-          id: Date.now(),
-          username: username.startsWith('@') ? username : '@' + username,
-          product: product,
-          price: price,
-          type: 'ripship',
-          timestamp: Date.now(),
-          source: 'manual'
-        });
-      }
-      
-      render();
+    
+    function addOrder(type) {
+      var un, pr, pri;
+      if (type==='ripship') { un=document.getElementById('manual-username').value.trim(); pr=document.getElementById('manual-product').value.trim(); pri=parseInt(document.getElementById('manual-price').value)||0; }
+      else { un=document.getElementById('event-username').value.trim(); pr=document.getElementById('event-type').value.trim(); pri=parseInt(document.getElementById('event-price').value)||0; }
+      if (!un||!pr) { alert('Fyll i alla fält'); return; }
+      queue.push({id:'manual_'+Date.now(),username:un,product:pr,price:pri,type:type,status:'waiting',source:'manual'});
+      revenue+=pri; save(); render();
+      if (type==='ripship') { document.getElementById('manual-username').value=''; document.getElementById('manual-product').value=''; document.getElementById('manual-price').value=''; }
+      else { document.getElementById('event-type').value=''; document.getElementById('event-username').value=''; document.getElementById('event-price').value=''; }
     }
-
-    function openOrder(index) {
-      if (currentOrder) {
-        alert('Du har redan en order som öppnas! Markera den som klar först.');
-        return;
-      }
-      
-      currentOrder = waitingQueue.splice(index, 1)[0];
-      render();
+    
+    function useQuickItem(qid) {
+      var it=null; for(var i=0;i<quickItems.length;i++)if(quickItems[i].id===qid){it=quickItems[i];break;}
+      if(!it)return; var un=prompt('Användarnamn för '+it.name+':'); if(!un)return;
+      queue.push({id:'quick_'+Date.now(),username:un,product:it.name,price:it.price,type:it.type,status:'waiting',source:'quick'});
+      revenue+=it.price; save(); render();
     }
-
+    
+    function addQuickItem() {
+      var nm=document.getElementById('quick-name').value.trim(), pr=parseInt(document.getElementById('quick-price').value)||0, ic=document.getElementById('quick-icon').value.trim()||'📦';
+      if(!nm){alert('Ange produktnamn');return;}
+      quickItems.push({id:'quick_'+Date.now(),name:nm,price:pr,icon:ic,type:'ripship'});
+      localStorage.setItem('tcg_quick_items',JSON.stringify(quickItems)); renderQuickItems(); toggleQuickForm();
+      document.getElementById('quick-name').value=''; document.getElementById('quick-price').value=''; document.getElementById('quick-icon').value='';
+    }
+    
+    function deleteQuickItem(qid) { if(!confirm('Ta bort detta snabbval?'))return; var ni=[]; for(var i=0;i<quickItems.length;i++)if(quickItems[i].id!==qid)ni.push(quickItems[i]); quickItems=ni; localStorage.setItem('tcg_quick_items',JSON.stringify(quickItems)); renderQuickItems(); }
+    function toggleQuickForm() { document.getElementById('add-quick-form').classList.toggle('hidden'); }
+    
+    function openOrder(oid) {
+      if(currentOrder){alert('Stäng nuvarande order först');return;}
+      var o=null; for(var i=0;i<queue.length;i++)if(queue[i].id===oid){o=queue[i];break;}
+      if(o){currentOrder=o;o.status='opening';save();render();}
+    }
+    
     function completeCurrent() {
-      if (!currentOrder) return;
-      
-      revenue += currentOrder.price || 0;
-      completed++;
-      currentOrder = null;
-      
-      if (waitingQueue.length > 0) {
-        currentOrder = waitingQueue.shift();
-      }
-      
-      render();
+      if(!currentOrder)return;
+      var next=null; for(var i=0;i<queue.length;i++)if(queue[i].id!==currentOrder.id&&queue[i].status==='waiting'){next=queue[i];break;}
+      completed++; var nq=[]; for(var i=0;i<queue.length;i++)if(queue[i].id!==currentOrder.id)nq.push(queue[i]); queue=nq;
+      if(next){currentOrder=next;currentOrder.status='opening';}else{currentOrder=null;}
+      save(); render();
     }
-
-    function skipCurrent() {
-      if (!currentOrder) return;
-      
-      waitingQueue.push(currentOrder);
-      currentOrder = null;
-      
-      if (waitingQueue.length > 0) {
-        currentOrder = waitingQueue.shift();
-      }
-      
-      render();
-    }
-
-    window.addEventListener('storage', (event) => {
-      if (event.key === 'tcg_waiting_queue' || event.key === 'tcg_current_order') {
-        waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
-        currentOrder = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
-        completed = parseInt(localStorage.getItem('tcg_completed')) || 0;
-        revenue = parseInt(localStorage.getItem('tcg_revenue')) || 0;
-        render();
-      }
-    });
-
-    render();
+    
+    function toggleForm() { document.getElementById('ripship-panel').classList.toggle('hidden'); document.getElementById('event-panel').classList.toggle('hidden'); }
+    function save() { localStorage.setItem('tcg_queue',JSON.stringify(queue)); localStorage.setItem('tcg_current',JSON.stringify(currentOrder)); localStorage.setItem('tcg_completed',completed); localStorage.setItem('tcg_revenue',revenue); }
+    
+    document.getElementById('btn-add-ripship').addEventListener('click',function(){addOrder('ripship');});
+    document.getElementById('btn-add-event').addEventListener('click',function(){addOrder('event');});
+    document.getElementById('btn-toggle-event').addEventListener('click',toggleForm);
+    document.getElementById('btn-toggle-ripship').addEventListener('click',toggleForm);
+    document.getElementById('btn-complete').addEventListener('click',completeCurrent);
+    document.getElementById('btn-toggle-quick').addEventListener('click',toggleQuickForm);
+    document.getElementById('btn-save-quick').addEventListener('click',addQuickItem);
+    document.getElementById('btn-cancel-quick').addEventListener('click',toggleQuickForm);
+    
+    render(); renderQuickItems();
   </script>
 </body>
 </html>
