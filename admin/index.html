@@ -396,18 +396,18 @@
             const waitingList = document.getElementById('waiting-list');
             
             if (waitingQueue.length === 0) {
-                waitingList.innerHTML = '<div class=\"empty-state\"><p>Inga ordrar i kö.</p></div>';
+                waitingList.innerHTML = '<div class="empty-state"><p>Inga ordrar i kö.</p></div>';
             } else {
                 waitingList.innerHTML = waitingQueue.map((order, index) => `
-                    <div class=\"waiting-item\">
-                        <div class=\"queue-position\">${index + 1}</div>
-                        <div class=\"queue-info\">
-                            <div class=\"queue-username\">${order.username}</div>
-                            <div class=\"queue-product\">${order.product}</div>
+                    <div class="waiting-item">
+                        <div class="queue-position">${index + 1}</div>
+                        <div class="queue-info">
+                            <div class="queue-username">${order.username}</div>
+                            <div class="queue-product">${order.product}</div>
                         </div>
-                        <span class=\"source-badge source-${order.source || 'manual'}\">${order.source === 'shopify' ? 'SHOPIFY' : order.source === 'demo' ? 'DEMO' : 'MANUELL'}</span>
-                        <button class=\"btn-open\" onclick=\"openOrder(${index})\">ÖPPNA</button>
-                        <button onclick=\"removeWaiting(${index})\" style=\"background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 12px; border-radius: 6px; cursor: pointer; margin-left: 8px;\">🗑</button>
+                        <span class="source-badge source-${order.source || 'manual'}">${order.source === 'shopify' ? 'SHOPIFY' : order.source === 'demo' ? 'DEMO' : 'MANUELL'}</span>
+                        <button class="btn-open" onclick="openOrder(${index})">ÖPPNA</button>
+                        <button onclick="removeWaiting(${index})" style="background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 12px; border-radius: 6px; cursor: pointer; margin-left: 8px;">🗑</button>
                     </div>
                 `).join('');
             }
@@ -446,20 +446,35 @@
             render();
         }
 
+        // 🎯 AUTOMATISKT hämta nästa när man trycker Klar
         function completeCurrent() {
             if (!currentOrder) return;
             
             revenue += currentOrder.price || 0;
             completed++;
             currentOrder = null;
+            
+            // Automatiskt hämta nästa i kön om det finns
+            if (waitingQueue.length > 0) {
+                currentOrder = waitingQueue.shift();
+            }
+            
             render();
         }
 
+        // 🎯 AUTOMATISKT hämta nästa när man trycker Skippa
         function skipCurrent() {
             if (!currentOrder) return;
             
+            // Lägg tillbaka current order i slutet av kön
             waitingQueue.push(currentOrder);
             currentOrder = null;
+            
+            // Hämta nästa automatiskt om det finns
+            if (waitingQueue.length > 0) {
+                currentOrder = waitingQueue.shift();
+            }
+            
             render();
         }
 
