@@ -13,7 +13,7 @@
       --text-secondary: rgba(255, 255, 255, 0.5);
       --accent: #3b82f6;
       --live: #ef4444;
-      --event: #ff6b9d; /* Rosa för alla event-typer */
+      --event: #ff6b9d;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -90,7 +90,7 @@
       50% { opacity: 0.4; transform: scale(0.8); }
     }
     
-    /* Current Section */
+    /* Current Section - SMALARE */
     .current-section {
       padding: 12px 14px;
       background: linear-gradient(180deg, rgba(59, 130, 246, 0.06) 0%, transparent 100%);
@@ -100,7 +100,7 @@
       background: transparent; 
       opacity: 0.6; 
     }
-    .current-section.event { /* Rosa för alla event */
+    .current-section.event {
       background: linear-gradient(180deg, rgba(255, 107, 157, 0.06) 0%, transparent 100%);
     }
     .section-label {
@@ -122,7 +122,6 @@
       color: var(--text-secondary); 
       margin-bottom: 6px;
     }
-    /* EVENT badge - för alla event-typer */
     .event-badge {
       display: inline-flex;
       align-items: center;
@@ -168,7 +167,7 @@
       padding: 6px; 
     }
     
-    /* Queue Items */
+    /* Queue Items - SMALARE & KONSISTENT */
     .queue-item {
       display: flex;
       align-items: center;
@@ -264,124 +263,12 @@
       </div>
     </div>
     
-    <!-- Nuvarande order -->
     <div class="current-section" id="current-section">
       <div class="section-label">Nu öppnas</div>
       <div class="current-user" id="current-user">@väntar...</div>
       <div class="current-product" id="current-product">Ingen order öppnas just nu</div>
-      <!-- EVENT badge - visas bara för event -->
       <span class="event-badge" id="event-badge" style="display: none;">🎉 EVENT</span>
     </div>
     
     <div class="queue-section">
-      <div class="queue-header">
-        <span class="queue-title">Nästa i kö</span>
-        <span class="queue-count" id="queue-count">0</span>
-      </div>
-      <div class="queue-list" id="queue-list">
-        <div class="empty-state">Ingen kö just nu</div>
-      </div>
-    </div>
-    
-    <div class="stats-footer">
-      <div class="stat-item">
-        <span>⏱</span>
-        <span>Est. <span class="stat-value" id="est-time">0 min</span></span>
-      </div>
-      <div class="stat-item">
-        <span>✓</span>
-        <span>Klara: <span class="stat-value" id="completed-count">0</span></span>
-      </div>
-    </div>
-  </div>
-  
-  <div class="demo-notice">demo</div>
-
-  <script>
-    let waitingQueue = [];
-    let currentOrder = null;
-    let completed = 0;
-
-    function loadFromStorage() {
-      try {
-        waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
-        currentOrder = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
-        completed = parseInt(localStorage.getItem('tcg_completed')) || 0;
-        render();
-      } catch (e) {
-        console.error('Error:', e);
-      }
-    }
-
-    function render() {
-      const currentSection = document.getElementById('current-section');
-      const currentUser = document.getElementById('current-user');
-      const currentProduct = document.getElementById('current-product');
-      const eventBadge = document.getElementById('event-badge');
-      
-      if (currentOrder) {
-        currentSection.classList.remove('inactive');
-        
-        // Visa EVENT badge för alla event-typer (duck, giveaway, packbattle, etc.)
-        if (currentOrder.type === 'event' || currentOrder.type === 'duck') {
-          currentSection.classList.add('event');
-          eventBadge.style.display = 'inline-flex';
-        } else {
-          currentSection.classList.remove('event');
-          eventBadge.style.display = 'none';
-        }
-        
-        currentUser.textContent = currentOrder.username || '@alla';
-        currentProduct.textContent = currentOrder.product || '-';
-      } else {
-        currentSection.classList.add('inactive');
-        currentSection.classList.remove('event');
-        eventBadge.style.display = 'none';
-        currentUser.textContent = '@väntar...';
-        currentProduct.textContent = 'Ingen order öppnas just nu';
-      }
-      
-      document.getElementById('queue-count').textContent = waitingQueue.length;
-      const queueList = document.getElementById('queue-list');
-      
-      if (waitingQueue.length === 0) {
-        queueList.innerHTML = '<div class="empty-state">Ingen kö just nu</div>';
-      } else {
-        // Visa alla i kön (inklusive event)
-        const displayQueue = waitingQueue.filter(order => {
-          // Visa om: inte duck/event, ELLER manuellt tillagd
-          return (order.type !== 'duck' && order.type !== 'event') || order.manualEvent === true || order.manualDuck === true;
-        });
-        
-        if (displayQueue.length === 0) {
-          queueList.innerHTML = '<div class="empty-state">Endast auto-ordrar</div>';
-        } else {
-          queueList.innerHTML = displayQueue.slice(0, 4).map((order, index) => `
-            <div class="queue-item ${(order.type === 'duck' || order.type === 'event') ? 'event' : ''}">
-              <div class="queue-position ${(order.type === 'duck' || order.type === 'event') ? 'event' : ''}">${index + 1}</div>
-              <div class="queue-info">
-                <div class="queue-username">${order.username || '@alla'}</div>
-                <div class="queue-product">${order.product}</div>
-              </div>
-            </div>
-          `).join('');
-        }
-      }
-      
-      // Beräkna est. tid (bara Rip n Ship, inte event)
-      const ripShipCount = waitingQueue.filter(o => o.type !== 'duck' && o.type !== 'event').length;
-      document.getElementById('est-time').textContent = (ripShipCount * 5) + ' min';
-      document.getElementById('completed-count').textContent = completed;
-    }
-
-    window.addEventListener('storage', (event) => {
-      if (event.key === 'tcg_waiting_queue' || event.key === 'tcg_current_order' || event.key === 'tcg_completed') {
-        loadFromStorage();
-      }
-    });
-
-    setInterval(loadFromStorage, 2000);
-    loadFromStorage();
-  </script>
-</body>
-</html>
+      <div class="queue-header
