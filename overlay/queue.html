@@ -1,408 +1,295 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBS Overlay - Don's TCG Queue</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg-primary: rgba(5, 5, 5, 0.98);
-            --bg-card: rgba(17, 17, 17, 0.99);
-            --border: rgba(255, 255, 255, 0.06);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.5);
-            --accent: #3b82f6;
-            --live: #ef4444;
-            --success: #22c55e;
-            --waiting: #f59e0b;
-        }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: transparent;
-            color: var(--text-primary);
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
-        }
-        .overlay-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 320px;
-            max-height: 480px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(20px);
-        }
-        
-        .overlay-header {
-            background: var(--bg-card);
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .logo-icon {
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, var(--accent), #8b5cf6);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
-        .brand { font-weight: 800; font-size: 14px; letter-spacing: 0.5px; }
-        .live-badge {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 10px;
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 100px;
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--live);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .live-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--live);
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.8); }
-        }
-        
-        .current-section {
-            padding: 18px;
-            background: linear-gradient(180deg, rgba(59, 130, 246, 0.08) 0%, transparent 100%);
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-        }
-        .current-section.inactive {
-            background: transparent;
-            opacity: 0.6;
-        }
-        .section-label {
-            font-size: 10px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-        .current-user {
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            letter-spacing: -0.5px;
-        }
-        .current-product {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            font-weight: 500;
-        }
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 100px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .status-live {
-            background: rgba(34, 197, 94, 0.15);
-            color: var(--success);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-        .status-waiting {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--waiting);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-        
-        .queue-section {
-            flex: 1;
-            overflow-y: auto;
-            max-height: 280px;
-        }
-        .queue-header {
-            padding: 14px 18px 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg-card);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        .queue-title {
-            font-size: 10px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 700;
-        }
-        .queue-count {
-            font-size: 12px;
-            color: var(--text-primary);
-            font-weight: 800;
-            background: rgba(59, 130, 246, 0.2);
-            padding: 4px 10px;
-            border-radius: 100px;
-        }
-        .queue-list {
-            padding: 8px;
-        }
-        .queue-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            margin-bottom: 6px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            transition: all 0.2s;
-        }
-        .queue-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-        .queue-position {
-            width: 28px;
-            height: 28px;
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid var(--accent);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 800;
-            color: var(--accent);
-            flex-shrink: 0;
-        }
-        .queue-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .queue-username {
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .queue-product {
-            font-size: 11px;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-weight: 500;
-        }
-        
-        .stats-footer {
-            padding: 14px 18px;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: var(--text-secondary);
-            flex-shrink: 0;
-            font-weight: 500;
-        }
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .stat-value {
-            color: var(--text-primary);
-            font-weight: 800;
-        }
-        
-        .queue-section::-webkit-scrollbar {
-            width: 4px;
-        }
-        .queue-section::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .queue-section::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--text-secondary);
-            font-size: 13px;
-            font-weight: 500;
-        }
-        .sync-status {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            font-size: 9px;
-            color: rgba(255,255,255,0.2);
-            font-weight: 500;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>OBS Overlay - Don's TCG (Demo)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-primary: rgba(5, 5, 5, 0.98);
+      --bg-card: rgba(17, 17, 17, 0.99);
+      --border: rgba(255, 255, 255, 0.06);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.5);
+      --accent: #3b82f6;
+      --live: #ef4444;
+      --success: #22c55e;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: transparent;
+      color: var(--text-primary);
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    .overlay-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 320px;
+      max-height: 480px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(20px);
+    }
+    .overlay-header {
+      background: var(--bg-card);
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand { font-weight: 800; font-size: 14px; letter-spacing: 0.5px; }
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--live);
+      text-transform: uppercase;
+    }
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--live);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+    .current-section {
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(59, 130, 246, 0.08) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .current-section.inactive { background: transparent; opacity: 0.6; }
+    .section-label {
+      font-size: 10px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .current-user { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+    .current-product { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .status-live { background: rgba(34, 197, 94, 0.15); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.3); }
+    .status-waiting { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+    
+    .queue-section { flex: 1; overflow-y: auto; max-height: 280px; }
+    .queue-header {
+      padding: 14px 18px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .queue-title { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+    .queue-count {
+      font-size: 12px;
+      color: var(--text-primary);
+      font-weight: 800;
+      background: rgba(59, 130, 246, 0.2);
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+    .queue-list { padding: 8px; }
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      margin-bottom: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .queue-position {
+      width: 28px;
+      height: 28px;
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .queue-info { flex: 1; min-width: 0; }
+    .queue-username { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .queue-product { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .stats-footer {
+      padding: 14px 18px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .stat-item { display: flex; align-items: center; gap: 6px; }
+    .stat-value { color: var(--text-primary); font-weight: 800; }
+    
+    .empty-state { text-align: center; padding: 30px 20px; color: var(--text-secondary); font-size: 13px; }
+    .demo-notice {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-size: 9px;
+      color: rgba(255,255,255,0.3);
+      background: rgba(0,0,0,0.5);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
-    <div class="overlay-container">
-        <div class="overlay-header">
-            <div class="header-left">
-                <div class="logo-icon">🎴</div>
-                <div class="brand">DON'S TCG</div>
-            </div>
-            <div class="live-badge">
-                <span class="live-dot"></span>
-                LIVE
-            </div>
-        </div>
-        
-        <div class="current-section" id="current-section">
-            <div class="section-label">Nu öppnas</div>
-            <div class="current-user" id="current-user">@väntar...</div>
-            <div class="current-product" id="current-product">Ingen order öppnas just nu</div>
-            <span class="status-badge status-waiting" id="status-badge">Väntar</span>
-        </div>
-        
-        <div class="queue-section">
-            <div class="queue-header">
-                <span class="queue-title">Nästa i kö</span>
-                <span class="queue-count" id="queue-count">0</span>
-            </div>
-            <div class="queue-list" id="queue-list">
-                <div class="empty-state">Ingen kö just nu</div>
-            </div>
-        </div>
-        
-        <div class="stats-footer">
-            <div class="stat-item">
-                <span>⏱</span>
-                <span>Est. <span class="stat-value" id="est-time">0 min</span></span>
-            </div>
-            <div class="stat-item">
-                <span>✓</span>
-                <span>Klara: <span class="stat-value" id="completed-count">0</span></span>
-            </div>
-        </div>
+  <div class="overlay-container">
+    <div class="overlay-header">
+      <div class="brand">🎴 DON'S TCG</div>
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        LIVE
+      </div>
     </div>
     
-    <div class="sync-status" id="sync-status">Sync: waiting...</div>
+    <div class="current-section" id="current-section">
+      <div class="section-label">Nu öppnas</div>
+      <div class="current-user" id="current-user">@väntar...</div>
+      <div class="current-product" id="current-product">Ingen order öppnas just nu</div>
+      <span class="status-badge status-waiting" id="status-badge">Väntar</span>
+    </div>
+    
+    <div class="queue-section">
+      <div class="queue-header">
+        <span class="queue-title">Nästa i kö</span>
+        <span class="queue-count" id="queue-count">0</span>
+      </div>
+      <div class="queue-list" id="queue-list">
+        <div class="empty-state">Ingen kö just nu</div>
+      </div>
+    </div>
+    
+    <div class="stats-footer">
+      <div class="stat-item">
+        <span>⏱</span>
+        <span>Est. <span class="stat-value" id="est-time">0 min</span></span>
+      </div>
+      <div class="stat-item">
+        <span>✓</span>
+        <span>Klara: <span class="stat-value" id="completed-count">0</span></span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="demo-notice">DEMO - localStorage only</div>
 
-    <script>
-        let waitingQueue = [];
-        let currentOrder = null;
-        let completed = 0;
-        let channel = null;
+  <script>
+    let waitingQueue = [];
+    let currentOrder = null;
+    let completed = 0;
+
+    function loadFromStorage() {
+      try {
+        waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
+        currentOrder = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
+        completed = parseInt(localStorage.getItem('tcg_completed')) || 0;
+        render();
+      } catch (e) {
+        console.error('Error:', e);
+      }
+    }
+
+    function render() {
+      const currentSection = document.getElementById('current-section');
+      const currentUser = document.getElementById('current-user');
+      const currentProduct = document.getElementById('current-product');
+      const statusBadge = document.getElementById('status-badge');
+      
+      if (currentOrder) {
+        currentSection.classList.remove('inactive');
+        currentUser.textContent = currentOrder.username || '@okänd';
+        currentProduct.textContent = currentOrder.product || '-';
+        statusBadge.textContent = 'LIVE NU';
+        statusBadge.className = 'status-badge status-live';
+      } else {
+        currentSection.classList.add('inactive');
+        currentUser.textContent = '@väntar...';
+        currentProduct.textContent = 'Ingen order öppnas just nu';
+        statusBadge.textContent = 'Väntar';
+        statusBadge.className = 'status-badge status-waiting';
+      }
+      
+      document.getElementById('queue-count').textContent = waitingQueue.length;
+      const queueList = document.getElementById('queue-list');
+      
+      if (waitingQueue.length === 0) {
+        queueList.innerHTML = '<div class="empty-state">Ingen kö just nu</div>';
+      } else {
+        // 🦆 Filtrera bort Duckrace från overlay
+        const ripShipQueue = waitingQueue.filter(order => 
+          !order.product.toLowerCase().includes('duck') &&
+          !order.product.toLowerCase().includes('race')
+        );
         
-        function initBroadcastChannel() {
-            try {
-                channel = new BroadcastChannel('tcg_queue_channel');
-                channel.onmessage = (event) => {
-                    if (event.data.type === 'queue-update') {
-                        loadFromStorage();
-                    }
-                };
-                document.getElementById('sync-status').textContent = 'Sync: OK';
-            } catch (e) {
-                document.getElementById('sync-status').textContent = 'Sync: polling';
-            }
+        if (ripShipQueue.length === 0) {
+          queueList.innerHTML = '<div class="empty-state">Endast Duckrace i kö (visas ej här)</div>';
+        } else {
+          queueList.innerHTML = ripShipQueue.slice(0, 3).map((order, index) => `
+            <div class="queue-item">
+              <div class="queue-position">${index + 1}</div>
+              <div class="queue-info">
+                <div class="queue-username">${order.username || '@okänd'}</div>
+                <div class="queue-product">${order.product.replace(' [DUCKRACE]', '')}</div>
+              </div>
+            </div>
+          `).join('');
         }
-        
-        function loadFromStorage() {
-            try {
-                waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
-                currentOrder = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
-                completed = parseInt(localStorage.getItem('tcg_completed')) || 0;
-                render();
-            } catch (e) {
-                console.error('Fel:', e);
-            }
-        }
-        
-        function render() {
-            const currentSection = document.getElementById('current-section');
-            const currentUser = document.getElementById('current-user');
-            const currentProduct = document.getElementById('current-product');
-            const statusBadge = document.getElementById('status-badge');
-            
-            if (currentOrder) {
-                currentSection.classList.remove('inactive');
-                currentUser.textContent = currentOrder.username || '@okänd';
-                currentProduct.textContent = currentOrder.product || '-';
-                statusBadge.textContent = 'LIVE NU';
-                statusBadge.className = 'status-badge status-live';
-            } else {
-                currentSection.classList.add('inactive');
-                currentUser.textContent = '@väntar...';
-                currentProduct.textContent = 'Ingen order öppnas just nu';
-                statusBadge.textContent = 'Väntar';
-                statusBadge.className = 'status-badge status-waiting';
-            }
-            
-            document.getElementById('queue-count').textContent = waitingQueue.length;
-            const queueList = document.getElementById('queue-list');
-            
-            if (waitingQueue.length === 0) {
-                queueList.innerHTML = '<div class="empty-state">Ingen kö just nu</div>';
-            } else {
-                queueList.innerHTML = waitingQueue.map((order, index) => `
-                    <div class="queue-item">
-                        <div class="queue-position">${index + 1}</div>
-                        <div class="queue-info">
-                            <div class="queue-username">${order.username || '@okänd'}</div>
-                            <div class="queue-product">${order.product || '-'}</div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-            
-            document.getElementById('est-time').textContent = (waitingQueue.length * 5) + ' min';
-            document.getElementById('completed-count').textContent = completed;
-        }
-        
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'tcg_waiting_queue' || event.key === 'tcg_current_order' || event.key === 'tcg_completed') {
-                loadFromStorage();
-            }
-        });
-        
-        setInterval(loadFromStorage, 2000);
-        
-        initBroadcastChannel();
+      }
+      
+      document.getElementById('est-time').textContent = (waitingQueue.length * 5) + ' min';
+      document.getElementById('completed-count').textContent = completed;
+    }
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'tcg_waiting_queue' || event.key === 'tcg_current_order' || event.key === 'tcg_completed') {
         loadFromStorage();
-    </script>
+      }
+    });
+
+    setInterval(loadFromStorage, 2000);
+    loadFromStorage();
+  </script>
 </body>
 </html>
