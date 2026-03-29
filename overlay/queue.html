@@ -7,14 +7,15 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg-primary: rgba(10, 10, 10, 0.95);
-            --bg-card: rgba(20, 20, 20, 0.98);
-            --border: rgba(255, 255, 255, 0.1);
+            --bg-primary: rgba(10, 10, 10, 0.98);
+            --bg-card: rgba(20, 20, 20, 0.99);
+            --border: rgba(255, 255, 255, 0.08);
             --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.6);
-            --accent: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.5);
+            --accent: #3b82f6;
             --live: #ef4444;
             --success: #22c55e;
+            --waiting: #f59e0b;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -28,33 +29,54 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 320px;
+            width: 380px;
+            max-height: 600px;
             background: var(--bg-primary);
             border: 1px solid var(--border);
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
         }
+        
         .overlay-header {
             background: var(--bg-card);
             padding: 16px 20px;
             border-bottom: 1px solid var(--border);
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
         }
-        .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14px; }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .brand { font-weight: 700; font-size: 15px; letter-spacing: 0.5px; }
         .live-badge {
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 4px 10px;
+            padding: 5px 10px;
             background: rgba(239, 68, 68, 0.15);
             border: 1px solid rgba(239, 68, 68, 0.3);
             border-radius: 100px;
             font-size: 11px;
             font-weight: 700;
             color: var(--live);
+            text-transform: uppercase;
         }
         .live-dot {
             width: 6px;
@@ -67,115 +89,243 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.4; }
         }
+        
         .current-section {
             padding: 20px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
             border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
         }
-        .current-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; }
-        .current-user { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-        .current-product { font-size: 13px; color: var(--text-secondary); }
-        .now-indicator {
+        .current-section.inactive {
+            background: transparent;
+            opacity: 0.7;
+        }
+        .section-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .current-user {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .current-product {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            margin-top: 12px;
-            padding: 4px 10px;
-            background: rgba(34, 197, 94, 0.15);
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 6px 12px;
             border-radius: 100px;
             font-size: 11px;
-            font-weight: 600;
-            color: var(--success);
-        }
-        .queue-section {
-            padding: 16px 20px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .queue-title {
-            font-size: 10px;
-            color: var(--text-secondary);
+            font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: 12px;
+        }
+        .status-live {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        .status-waiting {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--waiting);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .queue-section {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 350px;
+        }
+        .queue-header {
+            padding: 16px 20px 12px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
-        .queue-list { display: flex; flex-direction: column; gap: 8px; }
+        .queue-title {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .queue-count {
+            font-size: 12px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+        .queue-list {
+            padding: 8px;
+        }
         .queue-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 12px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        .queue-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
         }
         .queue-position {
-            width: 24px;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--accent);
+            flex-shrink: 0;
         }
-        .queue-username { font-size: 13px; font-weight: 600; }
-        .queue-product { font-size: 11px; color: var(--text-secondary); }
+        .queue-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .queue-username {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .queue-product {
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .queue-status {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+        
         .stats-footer {
-            padding: 12px 20px;
+            padding: 14px 20px;
             background: var(--bg-card);
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-secondary);
+            flex-shrink: 0;
         }
-        .empty-state { text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px; }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stat-value {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+        
+        .queue-section::-webkit-scrollbar {
+            width: 6px;
+        }
+        .queue-section::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .queue-section::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .queue-section::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
         .sync-status {
             position: fixed;
             bottom: 10px;
             right: 10px;
             font-size: 10px;
-            color: rgba(255,255,255,0.3);
-            background: rgba(0,0,0,0.5);
-            padding: 4px 8px;
-            border-radius: 4px;
+            color: rgba(255,255,255,0.2);
         }
     </style>
 </head>
 <body>
     <div class="overlay-container">
         <div class="overlay-header">
-            <div class="brand">🎴 DON'S TCG</div>
-            <div class="live-badge"><span class="live-dot"></span>LIVE</div>
+            <div class="header-left">
+                <div class="logo-icon">🎴</div>
+                <div class="brand">DON'S TCG</div>
+            </div>
+            <div class="live-badge">
+                <span class="live-dot"></span>
+                LIVE
+            </div>
         </div>
         
-        <div class="current-section">
-            <div class="current-label">Nu öppnas</div>
-            <div class="current-user" id="current-user">Väntar...</div>
-            <div class="current-product" id="current-product">-</div>
-            <div class="now-indicator" id="now-indicator" style="display: none;">✓ LIVE NU</div>
+        <div class="current-section" id="current-section">
+            <div class="section-label">Nu öppnas</div>
+            <div class="current-user" id="current-user">@väntar...</div>
+            <div class="current-product" id="current-product">Ingen order öppnas just nu</div>
+            <span class="status-badge status-waiting" id="status-badge">Väntar</span>
         </div>
         
         <div class="queue-section">
-            <div class="queue-title">Nästa i kö <span id="queue-count">0</span></div>
-            <div class="queue-list" id="queue-list"><div class="empty-state">Ingen kö</div></div>
+            <div class="queue-header">
+                <span class="queue-title">Nästa i kö</span>
+                <span class="queue-count"><span id="queue-count">0</span> personer</span>
+            </div>
+            <div class="queue-list" id="queue-list">
+                <div class="empty-state">Ingen kö just nu</div>
+            </div>
         </div>
         
         <div class="stats-footer">
-            <div>⏱ Est. <span id="est-time">0 min</span></div>
-            <div>✓ Klara: <span id="completed-count">0</span></div>
+            <div class="stat-item">
+                <span>⏱</span>
+                <span>Est. <span class="stat-value" id="est-time">0 min</span></span>
+            </div>
+            <div class="stat-item">
+                <span>✓</span>
+                <span>Klara: <span class="stat-value" id="completed-count">0</span></span>
+            </div>
         </div>
     </div>
     
     <div class="sync-status" id="sync-status">Sync: waiting...</div>
 
     <script>
-        let queue = [];
+        let waitingQueue = [];
+        let currentOrder = null;
         let completed = 0;
         let channel = null;
         
@@ -195,12 +345,9 @@
         
         function loadFromStorage() {
             try {
-                const savedQueue = localStorage.getItem('tcg_queue');
-                const savedCompleted = localStorage.getItem('tcg_completed');
-                
-                if (savedQueue) queue = JSON.parse(savedQueue);
-                if (savedCompleted) completed = parseInt(savedCompleted);
-                
+                waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
+                currentOrder = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
+                completed = parseInt(localStorage.getItem('tcg_completed')) || 0;
                 render();
             } catch (e) {
                 console.error('Fel:', e);
@@ -208,50 +355,54 @@
         }
         
         function render() {
+            const currentSection = document.getElementById('current-section');
             const currentUser = document.getElementById('current-user');
             const currentProduct = document.getElementById('current-product');
-            const nowIndicator = document.getElementById('now-indicator');
+            const statusBadge = document.getElementById('status-badge');
             
-            if (queue.length > 0) {
-                const order = queue[0];
-                currentUser.textContent = order.username || 'Okänd';
-                currentProduct.textContent = order.product || '-';
-                nowIndicator.style.display = 'inline-flex';
+            if (currentOrder) {
+                currentSection.classList.remove('inactive');
+                currentUser.textContent = currentOrder.username || '@okänd';
+                currentProduct.textContent = currentOrder.product || '-';
+                statusBadge.textContent = 'LIVE NU';
+                statusBadge.className = 'status-badge status-live';
             } else {
-                currentUser.textContent = 'Väntar på order...';
-                currentProduct.textContent = '-';
-                nowIndicator.style.display = 'none';
+                currentSection.classList.add('inactive');
+                currentUser.textContent = '@väntar...';
+                currentProduct.textContent = 'Ingen order öppnas just nu';
+                statusBadge.textContent = 'Väntar';
+                statusBadge.className = 'status-badge status-waiting';
             }
             
-            const remaining = Math.max(0, queue.length - 1);
-            document.getElementById('queue-count').textContent = remaining + ' personer';
-            
+            document.getElementById('queue-count').textContent = waitingQueue.length;
             const queueList = document.getElementById('queue-list');
-            if (remaining === 0) {
-                queueList.innerHTML = '<div class="empty-state">Ingen kö just nu</div>';
+            
+            if (waitingQueue.length === 0) {
+                queueList.innerHTML = '<div class=\"empty-state\">Ingen kö just nu</div>';
             } else {
-                queueList.innerHTML = queue.slice(1, 6).map((order, index) => `
-                    <div class="queue-item">
-                        <div class="queue-position">${index + 1}</div>
-                        <div>
-                            <div class="queue-username">${order.username || 'Okänd'}</div>
-                            <div class="queue-product">${order.product || '-'}</div>
+                queueList.innerHTML = waitingQueue.map((order, index) => `
+                    <div class=\"queue-item\">
+                        <div class=\"queue-position\">${index + 1}</div>
+                        <div class=\"queue-info\">
+                            <div class=\"queue-username\">${order.username || '@okänd'}</div>
+                            <div class=\"queue-product\">${order.product || '-'}</div>
                         </div>
+                        <span class=\"queue-status\">VÄNTAR</span>
                     </div>
                 `).join('');
             }
             
-            document.getElementById('est-time').textContent = (remaining * 5) + ' min';
+            document.getElementById('est-time').textContent = (waitingQueue.length * 5) + ' min';
             document.getElementById('completed-count').textContent = completed;
         }
         
         window.addEventListener('storage', (event) => {
-            if (event.key === 'tcg_queue' || event.key === 'tcg_completed') {
+            if (event.key === 'tcg_waiting_queue' || event.key === 'tcg_current_order' || event.key === 'tcg_completed') {
                 loadFromStorage();
             }
         });
         
-        setInterval(loadFromStorage, 3000);
+        setInterval(loadFromStorage, 2000);
         
         initBroadcastChannel();
         loadFromStorage();
