@@ -135,8 +135,6 @@
             color: var(--text-secondary);
         }
         .empty-state { text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px; }
-        
-        /* Debug-indikator */
         .sync-status {
             position: fixed;
             bottom: 10px;
@@ -177,49 +175,38 @@
     <div class="sync-status" id="sync-status">Sync: waiting...</div>
 
     <script>
-        // 🔄 REAL-TIME SYNC med BroadcastChannel
         let queue = [];
         let completed = 0;
         let channel = null;
         
-        // Skapa BroadcastChannel för kommunikation mellan flikar
         function initBroadcastChannel() {
             try {
                 channel = new BroadcastChannel('tcg_queue_channel');
                 channel.onmessage = (event) => {
-                    console.log('📨 Meddelande mottaget:', event.data);
                     if (event.data.type === 'queue-update') {
                         loadFromStorage();
                     }
                 };
-                document.getElementById('sync-status').textContent = 'Sync: OK (Broadcast)';
+                document.getElementById('sync-status').textContent = 'Sync: OK';
             } catch (e) {
-                console.warn('BroadcastChannel inte stödd, fallback till polling');
                 document.getElementById('sync-status').textContent = 'Sync: polling';
             }
         }
         
-        // Ladda data från localStorage
         function loadFromStorage() {
             try {
                 const savedQueue = localStorage.getItem('tcg_queue');
                 const savedCompleted = localStorage.getItem('tcg_completed');
                 
-                if (savedQueue) {
-                    queue = JSON.parse(savedQueue);
-                }
-                if (savedCompleted) {
-                    completed = parseInt(savedCompleted);
-                }
+                if (savedQueue) queue = JSON.parse(savedQueue);
+                if (savedCompleted) completed = parseInt(savedCompleted);
                 
                 render();
-                console.log('✅ Data laddad:', queue.length, 'ordrar');
             } catch (e) {
-                console.error('Fel vid laddning:', e);
+                console.error('Fel:', e);
             }
         }
         
-        // Rendera overlay
         function render() {
             const currentUser = document.getElementById('current-user');
             const currentProduct = document.getElementById('current-product');
@@ -258,18 +245,14 @@
             document.getElementById('completed-count').textContent = completed;
         }
         
-        // Lyssna på localStorage ändringar (backup)
         window.addEventListener('storage', (event) => {
             if (event.key === 'tcg_queue' || event.key === 'tcg_completed') {
-                console.log('🔄 Storage event mottaget');
                 loadFromStorage();
             }
         });
         
-        // Polling som backup (var 3:e sekund)
         setInterval(loadFromStorage, 3000);
         
-        // Init
         initBroadcastChannel();
         loadFromStorage();
     </script>
