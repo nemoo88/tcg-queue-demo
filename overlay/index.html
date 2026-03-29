@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <title>OBS Overlay - Don's TCG</title>
+  <title>OBS Overlay - TCG Queue System</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -38,7 +38,6 @@
       backdrop-filter: blur(20px);
     }
     
-    /* Header */
     .overlay-header {
       background: var(--bg-card);
       padding: 10px 14px;
@@ -90,7 +89,6 @@
       50% { opacity: 0.4; transform: scale(0.8); }
     }
     
-    /* Current Section - SMALARE */
     .current-section {
       padding: 12px 14px;
       background: linear-gradient(180deg, rgba(59, 130, 246, 0.06) 0%, transparent 100%);
@@ -136,7 +134,6 @@
       border: 1px solid rgba(255, 107, 157, 0.3);
     }
     
-    /* Queue Section */
     .queue-section { 
       flex: 1; 
     }
@@ -167,7 +164,6 @@
       padding: 6px; 
     }
     
-    /* Queue Items - SMALARE & KONSISTENT */
     .queue-item {
       display: flex;
       align-items: center;
@@ -222,7 +218,6 @@
       line-height: 1.2;
     }
     
-    /* Footer */
     .stats-footer {
       padding: 10px 14px;
       background: var(--bg-card);
@@ -255,7 +250,7 @@
     <div class="overlay-header">
       <div class="brand">
         <div class="brand-icon">🎴</div>
-        DON'S TCG
+        TCG QUEUE
       </div>
       <div class="live-badge">
         <span class="live-dot"></span>
@@ -271,4 +266,102 @@
     </div>
     
     <div class="queue-section">
-      <div class="queue-header
+      <div class="queue-header">
+        <span class="queue-title">Nästa i kö</span>
+        <span class="queue-count" id="queue-count">0</span>
+      </div>
+      <div class="queue-list" id="queue-list">
+        <div class="empty-state">Ingen kö just nu</div>
+      </div>
+    </div>
+    
+    <div class="stats-footer">
+      <div class="stat-item">
+        <span>⏱</span>
+        <span>Est. <span class="stat-value" id="est-time">0 min</span></span>
+      </div>
+      <div class="stat-item">
+        <span>✓</span>
+        <span>Klara: <span class="stat-value" id="completed-count">0</span></span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="demo-notice">demo</div>
+
+  <script>
+    let waitingQueue = [];
+    let currentOrder = null;
+    let completed = 0;
+
+    function loadFromStorage() {
+      try {
+        waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
+        currentOrder = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
+        completed = parseInt(localStorage.getItem('tcg_completed')) || 0;
+        render();
+      } catch (e) {
+        console.error('Error:', e);
+      }
+    }
+
+    function render() {
+      const currentSection = document.getElementById('current-section');
+      const currentUser = document.getElementById('current-user');
+      const currentProduct = document.getElementById('current-product');
+      const eventBadge = document.getElementById('event-badge');
+      
+      if (currentOrder) {
+        currentSection.classList.remove('inactive');
+        
+        if (currentOrder.type === 'event') {
+          currentSection.classList.add('event');
+          eventBadge.style.display = 'inline-flex';
+        } else {
+          currentSection.classList.remove('event');
+          eventBadge.style.display = 'none';
+        }
+        
+        currentUser.textContent = currentOrder.username || '@alla';
+        currentProduct.textContent = currentOrder.product || '-';
+      } else {
+        currentSection.classList.add('inactive');
+        currentSection.classList.remove('event');
+        eventBadge.style.display = 'none';
+        currentUser.textContent = '@väntar...';
+        currentProduct.textContent = 'Ingen order öppnas just nu';
+      }
+      
+      document.getElementById('queue-count').textContent = waitingQueue.length;
+      const queueList = document.getElementById('queue-list');
+      
+      if (waitingQueue.length === 0) {
+        queueList.innerHTML = '<div class="empty-state">Ingen kö just nu</div>';
+      } else {
+        queueList.innerHTML = waitingQueue.slice(0, 4).map((order, index) => `
+          <div class="queue-item ${order.type === 'event' ? 'event' : ''}">
+            <div class="queue-position ${order.type === 'event' ? 'event' : ''}">${index + 1}</div>
+            <div class="queue-info">
+              <div class="queue-username">${order.username || '@alla'}</div>
+              <div class="queue-product">${order.product}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      const ripShipCount = waitingQueue.filter(o => o.type === 'ripship').length;
+      document.getElementById('est-time').textContent = (ripShipCount * 5) + ' min';
+      document.getElementById('completed-count').textContent = completed;
+    }
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'tcg_waiting_queue' || event.key === 'tcg_current_order' || event.key === 'tcg_completed') {
+        loadFromStorage();
+      }
+    });
+
+    setInterval(loadFromStorage, 2000);
+    loadFromStorage();
+  </script>
+</body>
+</html>
