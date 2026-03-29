@@ -19,6 +19,7 @@
             --warning: #f59e0b;
             --danger: #ef4444;
             --shopify: #95bf47;
+            --info: #3b82f6;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -62,12 +63,92 @@
         .stat-label { font-size: 13px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; }
         .stat-value { font-size: 28px; font-weight: 700; }
         
-        .current-section {
+        .waiting-section {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 24px;
             margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .waiting-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .waiting-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+        .waiting-item:hover {
+            border-color: var(--info);
+        }
+        .queue-position {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+        .queue-info { flex: 1; }
+        .queue-username { font-weight: 600; margin-bottom: 2px; }
+        .queue-product { font-size: 13px; color: var(--text-secondary); }
+        .source-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+        .source-shopify { background: var(--shopify); color: #000; }
+        .source-demo { background: var(--warning); color: #000; }
+        .source-manual { background: var(--text-secondary); color: #000; }
+        
+        .btn-open {
+            padding: 8px 16px;
+            background: var(--info);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-open:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .current-section {
+            background: var(--bg-card);
+            border: 2px solid var(--success);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .current-section.inactive {
+            border-color: var(--border);
+            border-style: dashed;
         }
         .current-header {
             display: flex;
@@ -99,12 +180,10 @@
         }
         .current-order {
             background: var(--bg-primary);
-            border: 2px solid var(--accent);
             border-radius: 12px;
             padding: 24px;
             text-align: center;
         }
-        .current-order.empty { border-color: var(--border); border-style: dashed; }
         .current-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; }
         .current-user { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
         .current-product { font-size: 16px; color: var(--text-secondary); margin-bottom: 20px; }
@@ -117,57 +196,14 @@
             cursor: pointer;
             border: none;
             transition: all 0.2s;
+            margin-right: 8px;
         }
-        .btn-success { background: var(--success); color: white; margin-right: 8px; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #16a34a; }
         .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); }
-        
-        .queue-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-        }
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .queue-list { display: flex; flex-direction: column; gap: 12px; }
-        .queue-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-        }
-        .queue-position {
-            width: 32px;
-            height: 32px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-secondary);
-        }
-        .queue-info { flex: 1; }
-        .queue-username { font-weight: 600; margin-bottom: 2px; }
-        .queue-product { font-size: 13px; color: var(--text-secondary); }
-        .source-badge {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 700;
-        }
-        .source-shopify { background: var(--shopify); color: #000; }
-        .source-demo { background: var(--warning); color: #000; }
+        .btn-secondary:hover { background: var(--border); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
         
         .sidebar { display: flex; flex-direction: column; gap: 24px; }
         .panel {
@@ -199,7 +235,30 @@
             font-weight: 600;
             cursor: pointer;
         }
+        .btn-primary:hover { background: var(--accent-hover); }
+        
         .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+        
+        .sync-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
     </style>
 </head>
 <body>
@@ -215,8 +274,8 @@
         <div class="content">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-label">I kö</div>
-                    <div class="stat-value" id="stat-queue">0</div>
+                    <div class="stat-label">Väntar</div>
+                    <div class="stat-value" id="stat-waiting">0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Klara idag</div>
@@ -232,32 +291,32 @@
                 </div>
             </div>
 
-            <div class="current-section">
+            <div class="current-section inactive" id="current-section">
                 <div class="current-header">
-                    <div class="live-indicator">
+                    <div class="live-indicator" id="live-indicator" style="display: none;">
                         <span class="live-dot"></span>
-                        LIVE NU
+                        ÖPPNAS NU
                     </div>
+                    <div id="current-status" style="color: var(--text-muted); font-size: 13px;">Ingen order öppnas</div>
                 </div>
-                <div class="current-order" id="current-order">
-                    <div class="current-label">Nuvarande order</div>
-                    <div class="current-user" id="current-user">Ingen aktiv order</div>
+                <div class="current-order" id="current-order" style="display: none;">
+                    <div class="current-user" id="current-user">-</div>
                     <div class="current-product" id="current-product">-</div>
-                    <div id="current-actions" style="display: none; margin-top: 20px;">
+                    <div style="margin-top: 20px;">
                         <button class="btn btn-success" onclick="completeCurrent()">✓ Klar - Nästa</button>
                         <button class="btn btn-secondary" onclick="skipCurrent()">→ Skippa</button>
                     </div>
                 </div>
             </div>
 
-            <div class="queue-section">
+            <div class="waiting-section">
                 <div class="section-title">
-                    Kölista
-                    <span style="font-size: 14px; color: var(--text-secondary);"><span id="queue-count">0</span> personer i kö</span>
+                    Kölista (väntar på att öppnas)
+                    <span style="font-size: 14px; color: var(--text-secondary);"><span id="waiting-count">0</span> ordrar</span>
                 </div>
-                <div class="queue-list" id="queue-list">
+                <div class="waiting-list" id="waiting-list">
                     <div class="empty-state">
-                        <p>Kön är tom. Lägg till ordrar från sidopanelen.</p>
+                        <p>Inga ordrar i kö. Lägg till manuellt eller vänta på Shopify-köp.</p>
                     </div>
                 </div>
             </div>
@@ -265,7 +324,7 @@
 
         <aside class="sidebar">
             <div class="panel">
-                <div class="panel-title">Lägg till order</div>
+                <div class="panel-title">Lägg till order manuellt</div>
                 <form id="add-form" onsubmit="addOrder(event)">
                     <div class="form-group">
                         <label class="form-label">Användarnamn</label>
@@ -294,8 +353,12 @@
         </aside>
     </main>
 
+    <div class="sync-indicator">
+        <span class="sync-dot"></span>
+        <span id="sync-text">Synkar...</span>
+    </div>
+
     <script>
-                // 🔄 BroadcastChannel för real-time sync
         let broadcastChannel = null;
         try {
             broadcastChannel = new BroadcastChannel('tcg_queue_channel');
@@ -304,73 +367,112 @@
         }
         
         function notifyOtherTabs() {
-            // Skicka meddelande via BroadcastChannel
             if (broadcastChannel) {
                 broadcastChannel.postMessage({ type: 'queue-update', timestamp: Date.now() });
             }
-            
-            // Trigga storage event manuellt (för backup)
             localStorage.setItem('tcg_sync_trigger', Date.now().toString());
         }
 
-        let queue = JSON.parse(localStorage.getItem('tcg_queue')) || [];
+        let waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
+        let currentOrder = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
         let completed = parseInt(localStorage.getItem('tcg_completed')) || 0;
         let revenue = parseInt(localStorage.getItem('tcg_revenue')) || 0;
 
+        function saveAll() {
+            localStorage.setItem('tcg_waiting_queue', JSON.stringify(waitingQueue));
+            localStorage.setItem('tcg_current_order', JSON.stringify(currentOrder));
+            localStorage.setItem('tcg_completed', completed);
+            localStorage.setItem('tcg_revenue', revenue);
+            notifyOtherTabs();
+        }
+
         function render() {
-            const currentUser = document.getElementById('current-user');
-            const currentProduct = document.getElementById('current-product');
-            const currentActions = document.getElementById('current-actions');
-            const currentOrder = document.getElementById('current-order');
-            
-            if (queue.length > 0) {
-                const order = queue[0];
-                currentUser.textContent = order.username;
-                currentProduct.textContent = order.product;
-                currentActions.style.display = 'block';
-                currentOrder.classList.remove('empty');
-            } else {
-                currentUser.textContent = 'Ingen aktiv order';
-                currentProduct.textContent = '-';
-                currentActions.style.display = 'none';
-                currentOrder.classList.add('empty');
-            }
-            
-            const remaining = Math.max(0, queue.length - 1);
-            document.getElementById('queue-count').textContent = remaining;
-            document.getElementById('stat-queue').textContent = remaining;
+            document.getElementById('stat-waiting').textContent = waitingQueue.length;
             document.getElementById('stat-completed').textContent = completed;
-            document.getElementById('stat-time').textContent = (remaining * 5) + ' min';
+            document.getElementById('stat-time').textContent = (waitingQueue.length * 5) + ' min';
             document.getElementById('stat-revenue').textContent = revenue.toLocaleString() + ' kr';
             
-            const queueList = document.getElementById('queue-list');
-            if (remaining === 0) {
-                queueList.innerHTML = '<div class="empty-state"><p>Kön är tom.</p></div>';
+            document.getElementById('waiting-count').textContent = waitingQueue.length;
+            const waitingList = document.getElementById('waiting-list');
+            
+            if (waitingQueue.length === 0) {
+                waitingList.innerHTML = '<div class=\"empty-state\"><p>Inga ordrar i kö.</p></div>';
+            } else {
+                waitingList.innerHTML = waitingQueue.map((order, index) => `
+                    <div class=\"waiting-item\">
+                        <div class=\"queue-position\">${index + 1}</div>
+                        <div class=\"queue-info\">
+                            <div class=\"queue-username\">${order.username}</div>
+                            <div class=\"queue-product\">${order.product}</div>
+                        </div>
+                        <span class=\"source-badge source-${order.source || 'manual'}\">${order.source === 'shopify' ? 'SHOPIFY' : order.source === 'demo' ? 'DEMO' : 'MANUELL'}</span>
+                        <button class=\"btn-open\" onclick=\"openOrder(${index})\">ÖPPNA</button>
+                        <button onclick=\"removeWaiting(${index})\" style=\"background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 12px; border-radius: 6px; cursor: pointer; margin-left: 8px;\">🗑</button>
+                    </div>
+                `).join('');
+            }
+            
+            const currentSection = document.getElementById('current-section');
+            const liveIndicator = document.getElementById('live-indicator');
+            const currentStatus = document.getElementById('current-status');
+            const currentOrderDiv = document.getElementById('current-order');
+            
+            if (currentOrder) {
+                currentSection.classList.remove('inactive');
+                currentSection.style.borderColor = 'var(--success)';
+                liveIndicator.style.display = 'flex';
+                currentStatus.style.display = 'none';
+                currentOrderDiv.style.display = 'block';
+                document.getElementById('current-user').textContent = currentOrder.username;
+                document.getElementById('current-product').textContent = currentOrder.product;
+            } else {
+                currentSection.classList.add('inactive');
+                currentSection.style.borderColor = 'var(--border)';
+                liveIndicator.style.display = 'none';
+                currentStatus.style.display = 'block';
+                currentOrderDiv.style.display = 'none';
+            }
+            
+            saveAll();
+        }
+
+        function openOrder(index) {
+            if (currentOrder) {
+                alert('Du har redan en order som öppnas! Markera den som klar först.');
                 return;
             }
             
-            queueList.innerHTML = queue.slice(1).map((order, index) => `
-                <div class="queue-item">
-                    <div class="queue-position">${index + 1}</div>
-                    <div class="queue-info">
-                        <div class="queue-username">${order.username}</div>
-                        <div class="queue-product">${order.product}</div>
-                    </div>
-                    <span class="source-badge source-${order.source || 'manual'}">${order.source === 'shopify' ? 'SHOPIFY' : order.source === 'demo' ? 'DEMO' : 'MANUELL'}</span>
-                    <button onclick="removeOrder(${index + 1})" style="background: transparent; border: 1px solid var(--border); color: var(--text-secondary); padding: 6px 12px; border-radius: 6px; cursor: pointer;">🗑</button>
-                </div>
-            `).join('');
+            currentOrder = waitingQueue.splice(index, 1)[0];
+            render();
+        }
+
+        function completeCurrent() {
+            if (!currentOrder) return;
             
-            localStorage.setItem('tcg_queue', JSON.stringify(queue));
-            localStorage.setItem('tcg_completed', completed);
-            localStorage.setItem('tcg_revenue', revenue);
+            revenue += currentOrder.price || 0;
+            completed++;
+            currentOrder = null;
+            render();
+        }
+
+        function skipCurrent() {
+            if (!currentOrder) return;
             
-            notifyOtherTabs(); // 🔄 Meddela andra flikar
+            waitingQueue.push(currentOrder);
+            currentOrder = null;
+            render();
+        }
+
+        function removeWaiting(index) {
+            if (confirm('Ta bort denna order?')) {
+                waitingQueue.splice(index, 1);
+                render();
+            }
         }
 
         function addOrder(e) {
             e.preventDefault();
-            queue.push({
+            waitingQueue.push({
                 id: Date.now(),
                 username: document.getElementById('input-username').value,
                 product: document.getElementById('input-product').value,
@@ -385,7 +487,7 @@
         function quickAdd(product, price) {
             const username = prompt('Användarnamn:');
             if (username) {
-                queue.push({
+                waitingQueue.push({
                     id: Date.now(),
                     username: username.startsWith('@') ? username : '@' + username,
                     product: product,
@@ -397,31 +499,34 @@
             }
         }
 
-        function completeCurrent() {
-            if (queue.length > 0) {
-                revenue += queue[0].price || 0;
-                queue.shift();
-                completed++;
-                render();
-            }
+        if (broadcastChannel) {
+            broadcastChannel.onmessage = (event) => {
+                if (event.data.type === 'queue-update') {
+                    waitingQueue = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
+                    currentOrder = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
+                    completed = parseInt(localStorage.getItem('tcg_completed')) || 0;
+                    revenue = parseInt(localStorage.getItem('tcg_revenue')) || 0;
+                    render();
+                }
+            };
         }
 
-        function skipCurrent() {
-            if (queue.length > 1) {
-                const order = queue.shift();
-                queue.push(order);
+        setInterval(() => {
+            const newWaiting = JSON.parse(localStorage.getItem('tcg_waiting_queue')) || [];
+            const newCurrent = JSON.parse(localStorage.getItem('tcg_current_order')) || null;
+            
+            if (JSON.stringify(newWaiting) !== JSON.stringify(waitingQueue) ||
+                JSON.stringify(newCurrent) !== JSON.stringify(currentOrder)) {
+                waitingQueue = newWaiting;
+                currentOrder = newCurrent;
+                completed = parseInt(localStorage.getItem('tcg_completed')) || 0;
+                revenue = parseInt(localStorage.getItem('tcg_revenue')) || 0;
                 render();
             }
-        }
-
-        function removeOrder(index) {
-            if (confirm('Ta bort order?')) {
-                queue.splice(index, 1);
-                render();
-            }
-        }
+        }, 2000);
 
         render();
+        document.getElementById('sync-text').textContent = 'Synkad';
     </script>
 </body>
 </html>
