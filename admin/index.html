@@ -373,8 +373,8 @@
         <div class="panel-title">Lägg till Event</div>
         <form id="event-form" onsubmit="addOrder(event, 'event')">
           <div class="form-group">
-            <label class="form-label">Vad det gäller / Event</label>
-            <input type="text" class="form-input" id="event-name" placeholder="t.ex. Duckrace, Giveaway, Packbattle" required>
+            <label class="form-label">Event-typ</label>
+            <input type="text" class="form-input" id="event-name" placeholder="t.ex. Giveaway, Packbattle, Tournament" required>
           </div>
           <div class="form-group">
             <label class="form-label">Deltagare / Vem <span style="font-weight: 400; color: var(--text-secondary);">(valfritt)</span></label>
@@ -383,7 +383,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Info / Antal / Nummer</label>
-            <input type="text" class="form-input" id="event-info" placeholder="t.ex. 3 ankor (#12, #15, #18)">
+            <input type="text" class="form-input" id="event-info" placeholder="t.ex. Entry #5, Team A, etc.">
           </div>
           <div class="form-group">
             <label class="form-label">Pris (kr) <span style="font-weight: 400; color: var(--text-secondary);">(valfritt)</span></label>
@@ -405,7 +405,7 @@
           <button class="btn btn-secondary" onclick="quickAdd('Booster Box', 1199, 'ripship')" style="text-align: left;">📦 Booster Box — 1 199 kr</button>
           <button class="btn btn-secondary" onclick="quickAdd('Elite Trainer Box', 449, 'ripship')" style="text-align: left;">🎁 ETB — 449 kr</button>
           <button class="btn btn-secondary" onclick="quickAdd('Booster Pack', 45, 'ripship')" style="text-align: left;">🃏 Booster Pack — 45 kr</button>
-          <button class="btn btn-event" onclick="quickAdd('Duckrace', 50, 'event')" style="text-align: left;">🦆 Duckrace — 50 kr</button>
+          <button class="btn btn-event" onclick="quickAdd('Giveaway Entry', 0, 'event')" style="text-align: left;">🎉 Giveaway — 0 kr</button>
         </div>
       </div>
     </aside>
@@ -539,7 +539,7 @@
 
     function quickAdd(product, price, type) {
       if (type === 'event') {
-        const eventName = prompt('Vad det gäller / Event: (t.ex. Duckrace, Card Battle)') || 'Event';
+        const eventName = prompt('Event-typ: (t.ex. Giveaway, Packbattle, Tournament)') || 'Event';
         const usernameInput = prompt('Deltagare / Vem (tryck OK för att hoppa över):') || '';
         const info = prompt('Info / Antal / Nummer:') || '';
         const notes = prompt('Anteckningar (valfritt):') || '';
