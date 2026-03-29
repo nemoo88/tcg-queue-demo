@@ -119,53 +119,100 @@
       border-radius: 20px;
       padding: 24px;
     }
-    .waiting-list { display: flex; flex-direction: column; gap: 12px; }
+    .waiting-list { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px; 
+      max-height: none; /* Ingen max-höjd, ingen scroll */
+      overflow: visible;
+    }
     .waiting-item {
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 16px;
+      gap: 12px; /* Mindre gap */
+      padding: 12px 16px; /* Mindre padding */
       background: var(--bg-primary);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 10px; /* Mindre radius */
+      min-height: auto; /* Ingen min-höjd */
     }
     .waiting-item.duckrace {
       border-color: var(--duck);
       background: rgba(255, 107, 157, 0.05);
     }
     .queue-position {
-      width: 36px; height: 36px;
+      width: 28px; /* Mindre */
+      height: 28px; /* Mindre */
       background: rgba(59, 130, 246, 0.2);
       border: 1px solid var(--accent);
-      border-radius: 10px;
+      border-radius: 8px; /* Mindre */
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
+      font-size: 12px; /* Mindre text */
       color: var(--accent);
+      flex-shrink: 0;
     }
     .queue-position.duck {
       background: rgba(255, 107, 157, 0.2);
       border-color: var(--duck);
       color: var(--duck);
     }
-    .queue-info { flex: 1; }
-    .queue-username { font-weight: 700; margin-bottom: 4px; }
-    .queue-product { font-size: 13px; color: var(--text-secondary); }
-    .queue-note { font-size: 11px; color: var(--text-secondary); font-style: italic; margin-top: 4px; }
+    .queue-info { 
+      flex: 1; 
+      min-width: 0;
+      overflow: hidden;
+    }
+    .queue-username { 
+      font-weight: 700; 
+      font-size: 14px; /* Mindre */
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .queue-product { 
+      font-size: 12px; /* Mindre */
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .queue-note { 
+      font-size: 10px; /* Mindre */
+      color: var(--text-secondary); 
+      font-style: italic; 
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .btn-open {
-      padding: 10px 20px;
+      padding: 8px 14px; /* Mindre */
       background: var(--accent);
       color: white;
       border: none;
-      border-radius: 8px;
-      font-size: 13px;
+      border-radius: 6px; /* Mindre */
+      font-size: 11px; /* Mindre */
       font-weight: 700;
       cursor: pointer;
+      flex-shrink: 0;
     }
     .btn-open.duck {
       background: var(--duck);
     }
+    .source-badge {
+      font-size: 9px; /* Mindre */
+      padding: 3px 8px; /* Mindre */
+      border-radius: 100px;
+      font-weight: 700;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .source-demo { background: var(--warning); color: #000; }
+    .source-manual { background: var(--text-secondary); color: #000; }
+    .source-duck { background: var(--duck); color: #fff; }
     
     .sidebar { display: flex; flex-direction: column; gap: 24px; }
     .panel {
@@ -192,6 +239,12 @@
       resize: vertical;
     }
     .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--accent); }
+    .form-hint {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      font-style: italic;
+    }
     .btn-primary {
       width: 100%;
       padding: 14px;
@@ -217,17 +270,6 @@
     }
     
     .empty-state { text-align: center; padding: 40px; color: var(--text-secondary); }
-    
-    .source-badge {
-      font-size: 10px;
-      padding: 4px 10px;
-      border-radius: 100px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-    .source-demo { background: var(--warning); color: #000; }
-    .source-manual { background: var(--text-secondary); color: #000; }
-    .source-duck { background: var(--duck); color: #fff; }
   </style>
 </head>
 <body>
@@ -327,8 +369,9 @@
             <input type="text" class="form-input" id="duck-event" placeholder="t.ex. Duckrace, Card Battle, Giveaway" required>
           </div>
           <div class="form-group">
-            <label class="form-label">Deltagare / Vem</label>
-            <input type="text" class="form-input" id="duck-username" placeholder="t.ex. @DonTCG eller namn" required>
+            <label class="form-label">Deltagare / Vem <span style="font-weight: 400; color: var(--text-secondary);">(valfritt)</span></label>
+            <input type="text" class="form-input" id="duck-username" placeholder="t.ex. @DonTCG eller lämna tom">
+            <div class="form-hint">Lämna tom om flera deltar eller skriv "Alla"</div>
           </div>
           <div class="form-group">
             <label class="form-label">Info / Antal / Nummer</label>
@@ -379,7 +422,6 @@
     }
 
     function render() {
-      // Räkna bara Rip n Ship i statistiken (inte Duckrace)
       const ripShipQueue = waitingQueue.filter(o => o.type !== 'duck');
       const duckQueue = waitingQueue.filter(o => o.type === 'duck');
       
@@ -403,12 +445,12 @@
           <div class="waiting-item ${order.type === 'duck' ? 'duckrace' : ''}">
             <div class="queue-position ${order.type === 'duck' ? 'duck' : ''}">${index + 1}</div>
             <div class="queue-info">
-              <div class="queue-username">${order.username}</div>
+              <div class="queue-username">${order.username || '@alla'}</div>
               <div class="queue-product">${order.product}</div>
               ${order.info ? `<div class="queue-note">📌 ${order.info}</div>` : ''}
               ${order.notes ? `<div class="queue-note">📝 ${order.notes}</div>` : ''}
             </div>
-            <span class="source-badge source-${order.type === 'duck' ? 'duck' : order.source}">${order.type === 'duck' ? '🦆 DUCK' : order.source === 'demo' ? 'DEMO' : 'MANUELL'}</span>
+            <span class="source-badge source-${order.type === 'duck' ? 'duck' : order.source}">${order.type === 'duck' ? '🦆' : order.source === 'demo' ? 'DEMO' : 'MANU'}</span>
             <button class="btn-open ${order.type === 'duck' ? 'duck' : ''}" onclick="openOrder(${index})">ÖPPNA</button>
           </div>
         `).join('');
@@ -423,7 +465,7 @@
         currentSection.style.borderColor = currentOrder.type === 'duck' ? 'var(--duck)' : 'var(--success)';
         currentStatus.textContent = currentOrder.type === 'duck' ? '🦆 DUCKRACE/ANNAT' : 'LIVE NU';
         currentOrderDiv.style.display = 'block';
-        document.getElementById('current-user').textContent = currentOrder.username;
+        document.getElementById('current-user').textContent = currentOrder.username || '@alla';
         document.getElementById('current-product').textContent = currentOrder.product;
         document.getElementById('current-note').textContent = 
           (currentOrder.info ? `📌 ${currentOrder.info} ` : '') + 
@@ -445,7 +487,7 @@
       
       if (type === 'duck') {
         eventName = document.getElementById('duck-event').value;
-        username = document.getElementById('duck-username').value;
+        username = document.getElementById('duck-username').value || '@alla';
         info = document.getElementById('duck-info').value;
         notes = document.getElementById('duck-notes').value;
         price = 0;
@@ -458,7 +500,7 @@
       
       const order = {
         id: Date.now(),
-        username: username.startsWith('@') ? username : '@' + username,
+        username: username.startsWith('@') ? username : username ? '@' + username : '@alla',
         product: product,
         price: price,
         type: type,
@@ -482,15 +524,15 @@
     function quickAdd(product, price, type) {
       if (type === 'duck') {
         const eventName = prompt('Vad det gäller / Event: (t.ex. Duckrace, Card Battle)') || 'Duckrace';
-        const username = prompt('Deltagare / Vem:') || '';
-        if (!username) return;
+        const username = prompt('Deltagare / Vem (valfritt):') || '';
+        if (!confirm('Lägg till utan deltagare?')) return;
         
         const info = prompt('Info / Antal / Nummer:') || '';
         const notes = prompt('Anteckningar (valfritt):') || '';
         
         waitingQueue.push({
           id: Date.now(),
-          username: username.startsWith('@') ? username : '@' + username,
+          username: username ? (username.startsWith('@') ? username : '@' + username) : '@alla',
           product: eventName,
           price: price,
           type: 'duck',
