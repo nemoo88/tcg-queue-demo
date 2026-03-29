@@ -2,12 +2,13 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <title>OBS Overlay - TCG Queue System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OBS Overlay</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --bg-primary: rgba(5, 5, 5, 0.95);
-      --bg-card: rgba(17, 17, 17, 0.98);
+      --bg-primary: rgba(10, 10, 10, 0.95);
+      --bg-card: rgba(26, 26, 26, 0.98);
       --border: rgba(255, 255, 255, 0.08);
       --text-primary: #ffffff;
       --text-secondary: rgba(255, 255, 255, 0.5);
@@ -37,7 +38,6 @@
       flex-direction: column;
       backdrop-filter: blur(20px);
     }
-    
     .overlay-header {
       background: var(--bg-card);
       padding: 10px 14px;
@@ -88,7 +88,6 @@
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(0.8); }
     }
-    
     .current-section {
       padding: 12px 14px;
       background: linear-gradient(180deg, rgba(59, 130, 246, 0.06) 0%, transparent 100%);
@@ -133,7 +132,6 @@
       color: var(--event);
       border: 1px solid rgba(255, 107, 157, 0.3);
     }
-    
     .queue-section { 
       flex: 1; 
     }
@@ -163,7 +161,6 @@
     .queue-list { 
       padding: 6px; 
     }
-    
     .queue-item {
       display: flex;
       align-items: center;
@@ -217,7 +214,6 @@
       text-overflow: ellipsis; 
       line-height: 1.2;
     }
-    
     .stats-footer {
       padding: 10px 14px;
       background: var(--bg-card);
@@ -229,19 +225,11 @@
     }
     .stat-item { display: flex; align-items: center; gap: 5px; }
     .stat-value { color: var(--text-primary); font-weight: 800; }
-    
     .empty-state { 
       text-align: center; 
       padding: 16px 14px; 
       color: var(--text-secondary); 
       font-size: 11px; 
-    }
-    .demo-notice {
-      position: fixed;
-      bottom: 8px;
-      right: 8px;
-      font-size: 8px;
-      color: rgba(255,255,255,0.15);
     }
   </style>
 </head>
@@ -250,7 +238,7 @@
     <div class="overlay-header">
       <div class="brand">
         <div class="brand-icon">🎴</div>
-        TCG QUEUE
+        <span>DITT NAMN</span>
       </div>
       <div class="live-badge">
         <span class="live-dot"></span>
@@ -286,14 +274,71 @@
       </div>
     </div>
   </div>
-  
-  <div class="demo-notice">demo</div>
 
   <script>
-    let waitingQueue = [];
-    let currentOrder = null;
-    let completed = 0;
-
-    function loadFromStorage() {
+    function loadData() {
       try {
-        waitingQueue = JSON.parse(local
+        var queue = JSON.parse(localStorage.getItem('tcg_queue') || '[]');
+        var currentOrder = JSON.parse(localStorage.getItem('tcg_current') || 'null');
+        var completed = parseInt(localStorage.getItem('tcg_completed') || '0');
+        
+        var waitingQueue = queue.filter(function(o) { return o.status === 'waiting'; });
+        
+        var currentSection = document.getElementById('current-section');
+        var currentUser = document.getElementById('current-user');
+        var currentProduct = document.getElementById('current-product');
+        var eventBadge = document.getElementById('event-badge');
+        
+        if (currentOrder) {
+          currentSection.classList.remove('inactive');
+          if (currentOrder.type === 'event') {
+            currentSection.classList.add('event');
+            eventBadge.style.display = 'inline-flex';
+          } else {
+            currentSection.classList.remove('event');
+            eventBadge.style.display = 'none';
+          }
+          currentUser.textContent = currentOrder.username || '@alla';
+          currentProduct.textContent = currentOrder.product || '-';
+        } else {
+          currentSection.classList.add('inactive');
+          currentSection.classList.remove('event');
+          eventBadge.style.display = 'none';
+          currentUser.textContent = '@väntar...';
+          currentProduct.textContent = 'Ingen order öppnas just nu';
+        }
+        
+        document.getElementById('queue-count').textContent = waitingQueue.length;
+        var queueList = document.getElementById('queue-list');
+        
+        if (waitingQueue.length === 0) {
+          queueList.innerHTML = '<div class="empty-state">Ingen kö just nu</div>';
+        } else {
+          var html = '';
+          for (var i = 0; i < Math.min(waitingQueue.length, 4); i++) {
+            var order = waitingQueue[i];
+            var isEvent = order.type === 'event';
+            html += '<div class="queue-item ' + (isEvent ? 'event' : '') + '">';
+            html += '<div class="queue-position ' + (isEvent ? 'event' : '') + '">' + (i + 1) + '</div>';
+            html += '<div class="queue-info">';
+            html += '<div class="queue-username">' + (order.username || '@alla') + '</div>';
+            html += '<div class="queue-product">' + order.product + '</div>';
+            html += '</div></div>';
+          }
+          queueList.innerHTML = html;
+        }
+        
+        var ripShipCount = waitingQueue.filter(function(o) { return o.type === 'ripship'; }).length;
+        document.getElementById('est-time').textContent = (ripShipCount * 5) + ' min';
+        document.getElementById('completed-count').textContent = completed;
+        
+      } catch (e) {
+        console.log('Overlay: Ingen data tillgänglig');
+      }
+    }
+
+    loadData();
+    setInterval(loadData, 5000);
+  </script>
+</body>
+</html>
