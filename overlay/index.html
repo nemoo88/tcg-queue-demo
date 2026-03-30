@@ -372,7 +372,7 @@
       
       if (waitingQueue.length === 0) {
         queueList.innerHTML = '<div class="empty-state">Ingen kö just nu</div>';
-      } else {
+      } else 
         let html = '';
         for (let i = 0; i < Math.min(waitingQueue.length, 4); i++) {
           const order = waitingQueue[i];
