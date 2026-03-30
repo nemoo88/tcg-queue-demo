@@ -9,51 +9,52 @@ Visit: [`https://nemoo88.github.io/tcg-queue-demo/`](https://nemoo88.github.io/t
 ## ✨ Demo Features
 
 - ✅ **Admin panel** with full functionality (password protected)
-- ✅ **Multiple products per order** - Add "2 pack Pika, 3 pack Booster" on same line
-- ✅ **⏭️ Skip** - Postpone orders to end of queue (both in queue and open)
-- ✅ **⏭️ Postpone open** - Postpone current order and open next
-- ✅ **OPEN button** for all orders (including events)
-- ✅ **✕ Remove button** for all orders
-- ✅ **🕐 Time since** order came in
-- ✅ **Events** with pink background (Giveaway, Duckrace, etc.)
-- ✅ **OBS Overlay** - Shows queue with both Rip n Ship and Events
-- ✅ **Dynamic time calculation** - System learns your pace and updates estimation
-- ✅ **🔄 Reset statistics** - Keeps queue, resets numbers
-- ✅ **Automatic next** - Next order opens at "Done - Next"
+- ✅ **Multiple products per order** - Add "2 pack Pika, 3 pack Booster" on the same line
+- ✅ **⏭️ Skip order** - Move order to end of queue (works for both waiting and open orders)
+- ✅ **⏭️ Next in queue** - Skip current order and open next automatically
+- ✅ **🔗 OPEN button** - Open any order on stream
+- ✅ **✕ Remove button** - Remove order from queue
+- ✅ **🕐 Time since** - See how long order has been waiting
+- ✅ **🎉 Events** - Handle giveaways, duckrace, pack battles (pink background)
+- ✅ **📺 OBS Overlay** - Show queue live in your stream
+- ✅ **📊 Dynamic timing** - System learns your pace and updates estimates
+- ✅ **🔄 Reset statistics** - Start fresh with new numbers (keeps queue)
+- ✅ **Automatic next** - Next order opens when you click "Done - Next"
 
 ## ⚠️ Limitations (Demo)
 
 - Data is only saved in browser (localStorage)
 - Everything disappears if you clear cache or switch browser
-- No Shopify integration (manual entry)
+- No Shopify integration (manual entry only)
 - No permanent storage
 
 ## 🔐 Security
 
-Admin panel is password protected. To test:
-- **Demo password:** `demo123`
+Admin panel is password protected to prevent unauthorized access.
 
-In the full version, you can change to your own password in `admin/index.html`.
+**Demo password:** `demo123`
+
+> 💡 In the full version, you can change to your own password in `admin/index.html`.
 
 ## 🎮 How to Use the Demo
 
 1. **Go to admin panel** (`/admin/`)
-2. **Log in with password:** `demo123`
-3. **Click "🎲 Load demo data"** to get some test orders
-4. **Test the buttons:**
-   - **⏭️** - Postpone order to end of queue
-   - **OPEN** - Open order on stream
-   - **✕** - Remove order
-   - **✓ Done - Next** - Mark done and open next automatically
+2. **Log in** with password: `demo123`
+3. **Load demo data** - Click "🎲 Load demo data" to get test orders
+4. **Test the features:**
+   - **⏭️ Skip** - Move order to back of queue
+   - **🔗 OPEN** - Open order on stream
+   - **✕ Remove** - Remove order from queue
+   - **✓ Done - Next** - Mark done and go to next automatically
 5. **Open overlay** in new tab to see how it looks in OBS
 
 ## 🛒 Full Version
 
 Contact for full version with:
-- Shopify integration (automatic orders)
-- Netlify Blob Storage (permanent storage)
-- HMAC verification (security)
-- Custom branding
+- 📥 Shopify integration (automatic orders from your store)
+- 💾 Netlify Blob Storage (permanent storage)
+- 🔒 HMAC verification (extra security)
+- 🎨 Custom branding (colors, logo, etc.)
 
 ---
 
