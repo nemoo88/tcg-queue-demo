@@ -35,10 +35,10 @@
     .container { max-width: 1400px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
     @media(max-width:1024px){.container{grid-template-columns:1fr}}
     .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-    .stat-card{position:relative;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px}
+    .stat-card{position:relative;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px 16px}
     .stat-label{font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:8px}
-    .stat-value{font-size:32px;font-weight:800}
-    .blue{color:var(--accent)}.green{color:var(--success)}.orange{color:var(--warning)}
+    .stat-value{font-size:24px;font-weight:800}
+    .blue{color:var(--accent)}.green{color:var(--success)}.orange{color:var(--warning)}.purple{color:#a855f7}
     .reset-all-section { margin-bottom: 24px; text-align: right; }
     .current-section{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center}
     .current-label{font-size:14px;color:var(--text-secondary);font-weight:600}
@@ -91,7 +91,7 @@
 
   <div class="container">
     <div class="main-content">
-      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
         <div class="stat-card">
           <div class="stat-label">Väntar</div>
           <div class="stat-value blue" id="stat-waiting">0</div>
@@ -103,6 +103,18 @@
         <div class="stat-card">
           <div class="stat-label">Omsättning</div>
           <div class="stat-value" id="stat-revenue">0 kr</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Snitt/intäkt</div>
+          <div class="stat-value orange" id="stat-avg-revenue">0 kr</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Totalt ordrar</div>
+          <div class="stat-value purple" id="stat-total-orders">0</div>
+        </div>
+        <div class="stat-card" style="grid-column: span 2;">
+          <div class="stat-label">Nästa i kön</div>
+          <div class="stat-value" id="stat-next-order" style="font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
         </div>
       </div>
 
@@ -219,6 +231,15 @@
       document.getElementById('stat-waiting').textContent = waiting.length;
       document.getElementById('stat-completed').textContent = completed;
       document.getElementById('stat-revenue').textContent = revenue.toLocaleString() + ' kr';
+      
+      // Nya stats
+      const avgRevenue = completed > 0 ? Math.round(revenue / completed) : 0;
+      document.getElementById('stat-avg-revenue').textContent = avgRevenue.toLocaleString() + ' kr';
+      document.getElementById('stat-total-orders').textContent = waiting.length + completed;
+      
+      // Nästa i kön
+      const nextOrder = waiting.find(o => o.status === 'waiting');
+      document.getElementById('stat-next-order').textContent = nextOrder ? nextOrder.username + ' - ' + nextOrder.product : '-';
       
       // Nuvarande order
       const cd = document.getElementById('current-details');
