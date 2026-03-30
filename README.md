@@ -7,7 +7,6 @@ En demo-version av TCG Live Rip n Ship Queue System för GitHub Pages.
 Besök: [`https://nemoo88.github.io/tcg-queue-demo/`](https://nemoo88.github.io/tcg-queue-demo/)
 
 ```
-
 ## ✨ Funktioner i demon
 
 - ✅ **Admin-panel** med full funktionalitet (lösenordsskyddad)
