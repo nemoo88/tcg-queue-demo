@@ -62,6 +62,8 @@
     .btn-success{background:var(--success);color:black}
     .btn-danger{background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.3)}
     .btn-danger:hover{background:var(--danger);color:white}
+    .btn-warning{background:rgba(245,158,11,.1);color:var(--warning);border:1px solid rgba(245,158,11,.3)}
+    .btn-warning:hover{background:var(--warning);color:black}
     .btn-skip{background:rgba(245,158,11,.1);color:var(--warning);border:1px solid rgba(245,158,11,.3);padding:6px 10px;font-size:13px;margin-right:4px}
     .btn-skip:hover{background:var(--warning);color:#000}
     .btn-remove{background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.3);padding:6px 10px;font-size:13px}
@@ -214,13 +216,16 @@
       // Nuvarande order
       const cd = document.getElementById('current-details');
       const bc = document.getElementById('btn-complete');
+      const bsc = document.getElementById('btn-skip-current');
       if (currentOrder) {
         cd.innerHTML = '<div style="font-size:16px;font-weight:700">' + currentOrder.username + '</div>' +
                        '<div style="font-size:13px;color:#888;margin-top:2px">' + currentOrder.product + '</div>';
         bc.classList.remove('hidden');
+        bsc.classList.remove('hidden');
       } else {
         cd.innerHTML = '<span class="current-empty">Ingen order öppnas</span>';
         bc.classList.add('hidden');
+        bsc.classList.add('hidden');
       }
       
       // Kölista
@@ -318,6 +323,25 @@
       const orderId = data.currentOrder.id;
       data.queue = data.queue.filter(o => o.id !== orderId);
       data.completed++;
+      data.currentOrder = null;
+      saveData(data);
+      render();
+      
+      // Öppna nästa automatiskt
+      const nextOrder = data.queue.find(o => o.status === 'waiting');
+      if (nextOrder) {
+        setTimeout(() => openOrder(nextOrder.id), 300);
+      }
+    }
+    
+    // Skjut upp nuvarande order
+    function skipCurrentOrder() {
+      const data = getData();
+      if (!data.currentOrder) return;
+      
+      // Lägg tillbaka i kön som waiting
+      data.currentOrder.status = 'waiting';
+      data.queue.push(data.currentOrder);
       data.currentOrder = null;
       saveData(data);
       render();
