@@ -414,18 +414,22 @@
       render();
     }
     
+    var isOpeningOrder = false;
     function openOrder(id) {
+      if (isOpeningOrder) return; // 🔒 Förhindra dubbelklick
       const data = getData();
       if (data.currentOrder) { alert('Stäng nuvarande order först'); return; }
       
       const order = data.queue.find(o => o.id === id);
       if (!order) return;
       
+      isOpeningOrder = true;
       order.status = 'open';
       order.openedAt = new Date().toISOString();
       data.currentOrder = order;
       saveData(data);
       render();
+      setTimeout(() => { isOpeningOrder = false; }, 300);
     }
     
     function completeCurrent() {
@@ -458,7 +462,13 @@
       const order = data.currentOrder;
       order.status = 'waiting';
       order.createdAt = new Date().toISOString();
-      data.queue.push(order); // 🔄 Lägg tillbaka i kön!
+      
+      // 🔍 Kolla att ordern inte redan finns i kön (förhindra dubbletter)
+      const alreadyInQueue = data.queue.some(o => o.id === order.id);
+      if (!alreadyInQueue) {
+        data.queue.push(order); // 🔄 Lägg tillbaka i kön!
+      }
+      
       data.currentOrder = null;
       saveData(data);
       render();
