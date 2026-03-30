@@ -91,7 +91,7 @@
 
   <div class="container">
     <div class="main-content">
-      <div class="stats-grid">
+      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
         <div class="stat-card">
           <div class="stat-label">Väntar</div>
           <div class="stat-value blue" id="stat-waiting">0</div>
@@ -99,10 +99,6 @@
         <div class="stat-card">
           <div class="stat-label">Klara idag</div>
           <div class="stat-value green" id="stat-completed">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Est. tid</div>
-          <div class="stat-value orange" id="stat-est">0 min</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Omsättning</div>
@@ -222,12 +218,6 @@
       // Stats
       document.getElementById('stat-waiting').textContent = waiting.length;
       document.getElementById('stat-completed').textContent = completed;
-      // 🕐 Dynamisk tid baserad på faktisk historik
-      const estMinutes = waiting.length * averageTimePerOrder;
-      document.getElementById('stat-est').textContent = estMinutes + ' min (' + averageTimePerOrder + ' min/order)';
-      
-      // Debug - logga värden för felsökning
-      console.log('Admin ETA:', estMinutes, 'min (avg:', averageTimePerOrder, ', queue:', waiting.length, ')');
       document.getElementById('stat-revenue').textContent = revenue.toLocaleString() + ' kr';
       
       // Nuvarande order
