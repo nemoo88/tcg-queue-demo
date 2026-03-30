@@ -287,6 +287,11 @@
     var isProcessing = false;
     var processingId = null;
     
+    // 💾 DEBUG: Always log to console
+    function debug(msg, data) {
+      console.log('[DEBUG] ' + msg, data || '');
+    }
+    
     function checkLogin() {
       const input = document.getElementById('login-password').value;
       if (input === ADMIN_PASSWORD) {
@@ -330,6 +335,7 @@
     var queue = [], currentOrder = null, completed = 0, revenue = 0;
     
     function init() {
+      debug('Init starting');
       const data = getData();
       queue = data.queue || [];
       currentOrder = data.currentOrder || null;
@@ -337,6 +343,7 @@
       revenue = data.totalRevenue || 0;
       render();
       setInterval(render, 3000);
+      debug('Init done, queue length:', queue.length);
     }
     
     function render() {
@@ -419,40 +426,70 @@
     }
     
     function openOrder(id) {
-      // 🔒 Check if already processing this order
-      if (isProcessing && processingId === id) return;
-      if (isProcessing) return; // Waiting for another operation
+      debug('openOrder() called with id:', id);
+      debug('isProcessing:', isProcessing, 'processingId:', processingId);
+      
+      if (isProcessing && processingId === id) {
+        debug('BLOCKED: Same order already being processed');
+        return;
+      }
+      if (isProcessing) {
+        debug('BLOCKED: Waiting for another operation');
+        return;
+      }
       
       const data = getData();
-      if (data.currentOrder) { alert('Close current order first'); return; }
+      debug('currentOrder:', data.currentOrder ? data.currentOrder.id : 'null');
+      
+      if (data.currentOrder) { 
+        debug('BLOCKED: There is already an open order');
+        alert('Close current order first'); 
+        return; 
+      }
       
       const order = data.queue.find(o => o.id === id);
-      if (!order) return;
+      if (!order) {
+        debug('BLOCKED: Order not found in queue');
+        return;
+      }
       
       // 🔒 Lock
       isProcessing = true;
       processingId = id;
+      debug('LOCKED: isProcessing=true, processingId=', id);
       
       order.status = 'open';
       order.openedAt = new Date().toISOString();
       data.currentOrder = order;
       saveData(data);
       render();
+      debug('Order opened, queue length:', data.queue.length);
       
       // 🔓 Unlock after 300ms
       setTimeout(() => { 
         isProcessing = false; 
         processingId = null;
+        debug('UNLOCKED: isProcessing=false');
       }, 300);
     }
     
     function completeCurrent() {
-      if (isProcessing) return;
+      debug('completeCurrent() called');
+      debug('isProcessing:', isProcessing);
+      
+      if (isProcessing) {
+        debug('BLOCKED: Waiting for another operation');
+        return;
+      }
       
       const data = getData();
-      if (!data.currentOrder) return;
+      if (!data.currentOrder) {
+        debug('BLOCKED: No open order');
+        return;
+      }
       
       isProcessing = true;
+      debug('LOCKED: isProcessing=true');
       
       const duration = (Date.now() - new Date(data.currentOrder.openedAt).getTime()) / 60000;
       data.completionHistory = data.completionHistory || [];
@@ -460,62 +497,104 @@
       if (data.completionHistory.length > 20) data.completionHistory.shift();
       data.averageTimePerOrder = Math.round(data.completionHistory.reduce((a,b) => a+b, 0) / data.completionHistory.length);
       
+      const removedId = data.currentOrder.id;
       data.queue = data.queue.filter(o => o.id !== data.currentOrder.id);
       data.currentOrder = null;
       data.completed++;
       saveData(data);
       render();
+      debug('Order completed, removed:', removedId, 'new queue length:', data.queue.length);
       
       const next = getData().queue.find(o => o.status === 'waiting');
       if (next) {
+        debug('Opening next order automatically:', next.id);
         setTimeout(() => {
           openOrder(next.id);
           isProcessing = false;
         }, 300);
       } else {
         isProcessing = false;
+        debug('UNLOCKED: isProcessing=false (no next)');
       }
     }
     
     function skipCurrentOrder() {
-      if (isProcessing) return;
+      debug('skipCurrentOrder() called');
+      debug('isProcessing:', isProcessing);
+      
+      if (isProcessing) {
+        debug('BLOCKED: Waiting for another operation');
+        return;
+      }
+      
       const data = getData();
-      if (!data.currentOrder) return;
+      if (!data.currentOrder) {
+        debug('BLOCKED: No open order');
+        return;
+      }
       
       isProcessing = true;
+      debug('LOCKED: isProcessing=true');
       
       const order = data.currentOrder;
+      debug('Skipping order:', order.id);
+      
       order.status = 'waiting';
       order.createdAt = new Date().toISOString();
       
       // 🔍 Check if order already in queue
       const alreadyInQueue = data.queue.some(o => o.id === order.id);
+      debug('alreadyInQueue:', alreadyInQueue);
+      
       if (!alreadyInQueue) {
         data.queue.push(order);
+        debug('Added order to queue, new queue length:', data.queue.length);
+      } else {
+        debug('Order already in queue, not adding again');
       }
       
       data.currentOrder = null;
       saveData(data);
       render();
       
-      setTimeout(() => { isProcessing = false; }, 300);
+      setTimeout(() => { 
+        isProcessing = false; 
+        debug('UNLOCKED: isProcessing=false');
+      }, 300);
     }
     
     function skipOrder(id) {
-      if (isProcessing && processingId === id) return;
-      if (isProcessing) return;
+      debug('skipOrder() called with id:', id);
+      debug('isProcessing:', isProcessing, 'processingId:', processingId);
+      
+      if (isProcessing && processingId === id) {
+        debug('BLOCKED: Same order already being processed');
+        return;
+      }
+      if (isProcessing) {
+        debug('BLOCKED: Waiting for another operation');
+        return;
+      }
       
       const data = getData();
       const orderIndex = data.queue.findIndex(o => o.id === id);
-      if (orderIndex === -1) return;
+      
+      if (orderIndex === -1) {
+        debug('BLOCKED: Order not found in queue');
+        return;
+      }
       
       isProcessing = true;
       processingId = id;
+      debug('LOCKED: isProcessing=true, processingId=', id);
+      debug('Order index in queue:', orderIndex, 'of', data.queue.length);
       
       // 🔄 Remove from current position and add to end
       const order = data.queue.splice(orderIndex, 1)[0];
       order.createdAt = new Date().toISOString();
       data.queue.push(order);
+      
+      debug('Moved order to end, new queue length:', data.queue.length);
       
       saveData(data);
       render();
@@ -523,21 +602,34 @@
       setTimeout(() => { 
         isProcessing = false; 
         processingId = null;
+        debug('UNLOCKED: isProcessing=false');
       }, 300);
     }
     
     function removeOrder(id) {
-      if (isProcessing) return;
+      debug('removeOrder() called with id:', id);
+      debug('isProcessing:', isProcessing);
+      
+      if (isProcessing) {
+        debug('BLOCKED: Waiting for another operation');
+        return;
+      }
       if (!confirm('Remove this order?')) return;
       
       isProcessing = true;
+      debug('LOCKED: isProcessing=true');
       
       const data = getData();
+      const oldLength = data.queue.length;
       data.queue = data.queue.filter(o => o.id !== id);
       saveData(data);
       render();
+      debug('Removed order, old length:', oldLength, 'new length:', data.queue.length);
       
-      setTimeout(() => { isProcessing = false; }, 300);
+      setTimeout(() => { 
+        isProcessing = false; 
+        debug('UNLOCKED: isProcessing=false');
+      }, 300);
     }
     
     function resetStats() {
@@ -548,9 +640,11 @@
       data.totalRevenue = 0;
       saveData(data);
       render();
+      debug('Statistics reset');
     }
     
     function addDemoData() {
+      debug('addDemoData() called');
       const data = getData();
       const baseTime = new Date();
       let timeOffset = 0;
@@ -590,6 +684,7 @@
       
       saveData(data);
       render();
+      debug('Demo data loaded, queue length:', data.queue.length);
       alert('✅ Demo data loaded!');
     }
     

@@ -287,6 +287,11 @@
     var isProcessing = false;
     var processingId = null;
     
+    // 💾 DEBUG: Logga alltid till console
+    function debug(msg, data) {
+      console.log('[DEBUG] ' + msg, data || '');
+    }
+    
     function checkLogin() {
       const input = document.getElementById('login-password').value;
       if (input === ADMIN_PASSWORD) {
@@ -330,6 +335,7 @@
     var queue = [], currentOrder = null, completed = 0, revenue = 0;
     
     function init() {
+      debug('Init startas');
       const data = getData();
       queue = data.queue || [];
       currentOrder = data.currentOrder || null;
@@ -337,6 +343,7 @@
       revenue = data.totalRevenue || 0;
       render();
       setInterval(render, 3000);
+      debug('Init klar, kölängd:', queue.length);
     }
     
     function render() {
@@ -419,40 +426,70 @@
     }
     
     function openOrder(id) {
-      // 🔒 Kolla om vi redan behandlar denna order
-      if (isProcessing && processingId === id) return;
-      if (isProcessing) return; // Väntar på annan operation
+      debug('openOrder() anropad med id:', id);
+      debug('isProcessing:', isProcessing, 'processingId:', processingId);
+      
+      if (isProcessing && processingId === id) {
+        debug('BLOCKERAD: Samma order behandlas redan');
+        return;
+      }
+      if (isProcessing) {
+        debug('BLOCKERAD: Väntar på annan operation');
+        return;
+      }
       
       const data = getData();
-      if (data.currentOrder) { alert('Stäng nuvarande order först'); return; }
+      debug('currentOrder:', data.currentOrder ? data.currentOrder.id : 'null');
+      
+      if (data.currentOrder) { 
+        debug('BLOCKERAD: Det finns redan en öppen order');
+        alert('Stäng nuvarande order först'); 
+        return; 
+      }
       
       const order = data.queue.find(o => o.id === id);
-      if (!order) return;
+      if (!order) {
+        debug('BLOCKERAD: Ordern hittades inte i kön');
+        return;
+      }
       
       // 🔒 Lås
       isProcessing = true;
       processingId = id;
+      debug('LÅST: isProcessing=true, processingId=', id);
       
       order.status = 'open';
       order.openedAt = new Date().toISOString();
       data.currentOrder = order;
       saveData(data);
       render();
+      debug('Order öppnad, kölängd:', data.queue.length);
       
       // 🔓 Lås upp efter 300ms
       setTimeout(() => { 
         isProcessing = false; 
         processingId = null;
+        debug('LÅST UPP: isProcessing=false');
       }, 300);
     }
     
     function completeCurrent() {
-      if (isProcessing) return;
+      debug('completeCurrent() anropad');
+      debug('isProcessing:', isProcessing);
+      
+      if (isProcessing) {
+        debug('BLOCKERAD: Väntar på annan operation');
+        return;
+      }
       
       const data = getData();
-      if (!data.currentOrder) return;
+      if (!data.currentOrder) {
+        debug('BLOCKERAD: Ingen öppen order');
+        return;
+      }
       
       isProcessing = true;
+      debug('LÅST: isProcessing=true');
       
       const duration = (Date.now() - new Date(data.currentOrder.openedAt).getTime()) / 60000;
       data.completionHistory = data.completionHistory || [];
@@ -460,62 +497,104 @@
       if (data.completionHistory.length > 20) data.completionHistory.shift();
       data.averageTimePerOrder = Math.round(data.completionHistory.reduce((a,b) => a+b, 0) / data.completionHistory.length);
       
+      const removedId = data.currentOrder.id;
       data.queue = data.queue.filter(o => o.id !== data.currentOrder.id);
       data.currentOrder = null;
       data.completed++;
       saveData(data);
       render();
+      debug('Order klar, tog bort:', removedId, 'ny kölängd:', data.queue.length);
       
       const next = getData().queue.find(o => o.status === 'waiting');
       if (next) {
+        debug('Öppnar nästa order automatiskt:', next.id);
         setTimeout(() => {
           openOrder(next.id);
           isProcessing = false;
         }, 300);
       } else {
         isProcessing = false;
+        debug('LÅST UPP: isProcessing=false (ingen nästa)');
       }
     }
     
     function skipCurrentOrder() {
-      if (isProcessing) return;
+      debug('skipCurrentOrder() anropad');
+      debug('isProcessing:', isProcessing);
+      
+      if (isProcessing) {
+        debug('BLOCKERAD: Väntar på annan operation');
+        return;
+      }
+      
       const data = getData();
-      if (!data.currentOrder) return;
+      if (!data.currentOrder) {
+        debug('BLOCKERAD: Ingen öppen order');
+        return;
+      }
       
       isProcessing = true;
+      debug('LÅST: isProcessing=true');
       
       const order = data.currentOrder;
+      debug('Skjuter upp order:', order.id);
+      
       order.status = 'waiting';
       order.createdAt = new Date().toISOString();
       
       // 🔍 Kolla att ordern inte redan finns i kön
       const alreadyInQueue = data.queue.some(o => o.id === order.id);
+      debug('alreadyInQueue:', alreadyInQueue);
+      
       if (!alreadyInQueue) {
         data.queue.push(order);
+        debug('La till order i kön, ny kölängd:', data.queue.length);
+      } else {
+        debug('Order fanns redan i kön, lade inte till igen');
       }
       
       data.currentOrder = null;
       saveData(data);
       render();
       
-      setTimeout(() => { isProcessing = false; }, 300);
+      setTimeout(() => { 
+        isProcessing = false; 
+        debug('LÅST UPP: isProcessing=false');
+      }, 300);
     }
     
     function skipOrder(id) {
-      if (isProcessing && processingId === id) return;
-      if (isProcessing) return;
+      debug('skipOrder() anropad med id:', id);
+      debug('isProcessing:', isProcessing, 'processingId:', processingId);
+      
+      if (isProcessing && processingId === id) {
+        debug('BLOCKERAD: Samma order behandlas redan');
+        return;
+      }
+      if (isProcessing) {
+        debug('BLOCKERAD: Väntar på annan operation');
+        return;
+      }
       
       const data = getData();
       const orderIndex = data.queue.findIndex(o => o.id === id);
-      if (orderIndex === -1) return;
+      
+      if (orderIndex === -1) {
+        debug('BLOCKERAD: Ordern hittades inte i kön');
+        return;
+      }
       
       isProcessing = true;
       processingId = id;
+      debug('LÅST: isProcessing=true, processingId=', id);
+      debug('Order index i kön:', orderIndex, 'av', data.queue.length);
       
       // 🔄 Ta bort från nuvarande position och lägg sist
       const order = data.queue.splice(orderIndex, 1)[0];
       order.createdAt = new Date().toISOString();
       data.queue.push(order);
+      
+      debug('Flyttade order till slutet, ny kölängd:', data.queue.length);
       
       saveData(data);
       render();
@@ -523,21 +602,34 @@
       setTimeout(() => { 
         isProcessing = false; 
         processingId = null;
+        debug('LÅST UPP: isProcessing=false');
       }, 300);
     }
     
     function removeOrder(id) {
-      if (isProcessing) return;
+      debug('removeOrder() anropad med id:', id);
+      debug('isProcessing:', isProcessing);
+      
+      if (isProcessing) {
+        debug('BLOCKERAD: Väntar på annan operation');
+        return;
+      }
       if (!confirm('Ta bort denna order?')) return;
       
       isProcessing = true;
+      debug('LÅST: isProcessing=true');
       
       const data = getData();
+      const oldLength = data.queue.length;
       data.queue = data.queue.filter(o => o.id !== id);
       saveData(data);
       render();
+      debug('Tog bort order, gammal längd:', oldLength, 'ny längd:', data.queue.length);
       
-      setTimeout(() => { isProcessing = false; }, 300);
+      setTimeout(() => { 
+        isProcessing = false; 
+        debug('LÅST UPP: isProcessing=false');
+      }, 300);
     }
     
     function resetStats() {
@@ -548,9 +640,11 @@
       data.totalRevenue = 0;
       saveData(data);
       render();
+      debug('Statistik nollställd');
     }
     
     function addDemoData() {
+      debug('addDemoData() anropad');
       const data = getData();
       const baseTime = new Date();
       let timeOffset = 0;
@@ -590,6 +684,7 @@
       
       saveData(data);
       render();
+      debug('Demo-data laddad, kölängd:', data.queue.length);
       alert('✅ Demo-data laddad!');
     }
     
