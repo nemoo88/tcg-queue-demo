@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OBS Overlay</title>
+  <title>OBS Overlay - Demo</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     :root {
       --bg-primary: rgba(10, 10, 10, 0.95);
       --bg-card: rgba(26, 26, 26, 0.98);
@@ -14,27 +15,8 @@
       --text-secondary: rgba(255, 255, 255, 0.5);
       --accent: #3b82f6;
       --live: #ef4444;
-      --event: #ff6b9d;
-      --warning: #f59e0b;
     }
-    /* Demo banner for overlay */
-    .demo-banner-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
-      color: #000;
-      text-align: center;
-      padding: 6px 10px;
-      font-size: 11px;
-      font-weight: 700;
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: transparent;
@@ -42,13 +24,13 @@
       overflow: hidden;
       width: 100vw;
       height: 100vh;
-      padding-top: 28px; /* Space for demo banner */
     }
+    
     .overlay-container {
       position: absolute;
-      top: 48px; /* Below demo banner */
+      top: 20px;
       right: 20px;
-      width: 260px;
+      width: 280px;
       background: var(--bg-primary);
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -58,6 +40,7 @@
       flex-direction: column;
       backdrop-filter: blur(20px);
     }
+    
     .overlay-header {
       background: var(--bg-card);
       padding: 10px 14px;
@@ -66,6 +49,7 @@
       justify-content: space-between;
       align-items: center;
     }
+    
     .brand { 
       font-weight: 800; 
       font-size: 12px; 
@@ -74,6 +58,7 @@
       align-items: center;
       gap: 6px;
     }
+    
     .brand-icon {
       width: 16px;
       height: 16px;
@@ -84,6 +69,7 @@
       justify-content: center;
       font-size: 10px;
     }
+    
     .live-badge {
       display: flex;
       align-items: center;
@@ -97,6 +83,7 @@
       color: var(--live);
       text-transform: uppercase;
     }
+    
     .live-dot {
       width: 5px;
       height: 5px;
@@ -104,57 +91,61 @@
       border-radius: 50%;
       animation: pulse 1.5s infinite;
     }
+    
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(0.8); }
     }
+    
     .current-section {
-      padding: 12px 14px;
+      padding: 14px;
       background: linear-gradient(180deg, rgba(59, 130, 246, 0.06) 0%, transparent 100%);
       border-bottom: 1px solid var(--border);
     }
+    
     .current-section.inactive { 
       background: transparent; 
       opacity: 0.6; 
     }
-    .current-section.event {
-      background: linear-gradient(180deg, rgba(255, 107, 157, 0.06) 0%, transparent 100%);
-    }
+    
     .section-label {
       font-size: 9px;
       color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       font-weight: 700;
     }
+    
     .current-user { 
-      font-size: 15px; 
+      font-size: 16px; 
       font-weight: 800; 
-      margin-bottom: 2px;
+      margin-bottom: 8px;
       letter-spacing: -0.3px;
     }
-    .current-product { 
-      font-size: 11px; 
-      color: var(--text-secondary); 
-      margin-bottom: 6px;
+    
+    .current-products {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
-    .event-badge {
-      display: inline-flex;
+    
+    .current-product-row {
+      display: flex;
       align-items: center;
-      gap: 5px;
-      padding: 3px 8px;
-      border-radius: 20px;
-      font-size: 9px;
-      font-weight: 800;
-      text-transform: uppercase;
-      background: rgba(255, 107, 157, 0.15);
-      color: var(--event);
-      border: 1px solid rgba(255, 107, 157, 0.3);
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
     }
+    
+    .product-icon {
+      font-size: 11px;
+    }
+    
     .queue-section { 
       flex: 1; 
     }
+    
     .queue-header {
       padding: 10px 14px 8px;
       display: flex;
@@ -163,6 +154,7 @@
       border-bottom: 1px solid var(--border);
       background: var(--bg-card);
     }
+    
     .queue-title { 
       font-size: 9px; 
       color: var(--text-secondary); 
@@ -170,6 +162,7 @@
       letter-spacing: 1.5px; 
       font-weight: 700; 
     }
+    
     .queue-count {
       font-size: 10px;
       color: var(--text-primary);
@@ -178,23 +171,22 @@
       padding: 2px 6px;
       border-radius: 10px;
     }
+    
     .queue-list { 
-      padding: 6px; 
+      padding: 8px; 
     }
+    
     .queue-item {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 10px;
-      margin-bottom: 3px;
+      padding: 8px 10px;
+      margin-bottom: 4px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border);
       border-radius: 8px;
     }
-    .queue-item.event {
-      border-color: rgba(255, 107, 157, 0.3);
-      background: rgba(255, 107, 157, 0.05);
-    }
+    
     .queue-position {
       width: 22px;
       height: 22px;
@@ -209,31 +201,27 @@
       color: var(--accent);
       flex-shrink: 0;
     }
-    .queue-position.event {
-      background: rgba(255, 107, 157, 0.2);
-      border-color: var(--event);
-      color: var(--event);
-    }
+    
     .queue-info { 
       flex: 1; 
       min-width: 0;
     }
+    
     .queue-username { 
       font-size: 12px;
-      font-weight: 700; 
+      font-weight: 700;
       white-space: nowrap; 
       overflow: hidden; 
       text-overflow: ellipsis; 
       line-height: 1.2;
     }
-    .queue-product { 
+    
+    .queue-meta {
       font-size: 10px;
-      color: var(--text-secondary); 
-      white-space: nowrap; 
-      overflow: hidden; 
-      text-overflow: ellipsis; 
-      line-height: 1.2;
+      color: var(--text-secondary);
+      margin-top: 2px;
     }
+    
     .stats-footer {
       padding: 10px 14px;
       background: var(--bg-card);
@@ -243,27 +231,44 @@
       font-size: 9px;
       color: var(--text-secondary);
     }
-    .stat-item { display: flex; align-items: center; gap: 5px; }
-    .stat-value { color: var(--text-primary); font-weight: 800; }
+    
+    .stat-item { 
+      display: flex; 
+      align-items: center; 
+      gap: 5px; 
+    }
+    
+    .stat-value { 
+      color: var(--text-primary); 
+      font-weight: 800; 
+    }
+    
     .empty-state { 
       text-align: center; 
       padding: 16px 14px; 
       color: var(--text-secondary); 
       font-size: 11px; 
     }
+    
+    .demo-notice {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(245, 158, 11, 0.9);
+      color: #000;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
-  <div class="demo-banner-overlay">
-    <span>⚠️</span>
-    DEMO • Data sparas endast lokalt
-  </div>
-
   <div class="overlay-container">
     <div class="overlay-header">
       <div class="brand">
         <div class="brand-icon">🎴</div>
-        <span>DITT NAMN</span>
+        <span>LIVE</span>
       </div>
       <div class="live-badge">
         <span class="live-dot"></span>
@@ -274,8 +279,9 @@
     <div class="current-section" id="current-section">
       <div class="section-label">Nu öppnas</div>
       <div class="current-user" id="current-user">@väntar...</div>
-      <div class="current-product" id="current-product">Ingen order öppnas just nu</div>
-      <span class="event-badge" id="event-badge" style="display: none;">🎉 EVENT</span>
+      <div class="current-products" id="current-products">
+        <div class="current-product-row">Ingen order öppnas just nu</div>
+      </div>
     </div>
     
     <div class="queue-section">
@@ -299,71 +305,79 @@
       </div>
     </div>
   </div>
+  
+  <div class="demo-notice">⚠️ DEMO</div>
 
   <script>
-    function loadData() {
+    const STORAGE_KEY = 'tcg_queue_demo';
+    
+    function getData() {
       try {
-        var queue = JSON.parse(localStorage.getItem('tcg_queue') || '[]');
-        var currentOrder = JSON.parse(localStorage.getItem('tcg_current') || 'null');
-        var completed = parseInt(localStorage.getItem('tcg_completed') || '0');
-        
-        var waitingQueue = queue.filter(function(o) { return o.status === 'waiting'; });
-        
-        var currentSection = document.getElementById('current-section');
-        var currentUser = document.getElementById('current-user');
-        var currentProduct = document.getElementById('current-product');
-        var eventBadge = document.getElementById('event-badge');
-        
-        if (currentOrder) {
-          currentSection.classList.remove('inactive');
-          if (currentOrder.type === 'event') {
-            currentSection.classList.add('event');
-            eventBadge.style.display = 'inline-flex';
-          } else {
-            currentSection.classList.remove('event');
-            eventBadge.style.display = 'none';
-          }
-          currentUser.textContent = currentOrder.username || '@alla';
-          currentProduct.textContent = currentOrder.product || '-';
-        } else {
-          currentSection.classList.add('inactive');
-          currentSection.classList.remove('event');
-          eventBadge.style.display = 'none';
-          currentUser.textContent = '@väntar...';
-          currentProduct.textContent = 'Ingen order öppnas just nu';
-        }
-        
-        document.getElementById('queue-count').textContent = waitingQueue.length;
-        var queueList = document.getElementById('queue-list');
-        
-        if (waitingQueue.length === 0) {
-          queueList.innerHTML = '<div class="empty-state">Ingen kö just nu</div>';
-        } else {
-          var html = '';
-          for (var i = 0; i < Math.min(waitingQueue.length, 4); i++) {
-            var order = waitingQueue[i];
-            var isEvent = order.type === 'event';
-            html += '<div class="queue-item ' + (isEvent ? 'event' : '') + '">';
-            html += '<div class="queue-position ' + (isEvent ? 'event' : '') + '">' + (i + 1) + '</div>';
-            html += '<div class="queue-info">';
-            html += '<div class="queue-username">' + (order.username || '@alla') + '</div>';
-            html += '<div class="queue-product">' + order.product + '</div>';
-            html += '</div></div>';
-          }
-          queueList.innerHTML = html;
-        }
-        
-        var ripShipCount = waitingQueue.filter(function(o) { return o.type === 'ripship'; }).length;
-        document.getElementById('est-time').textContent = (ripShipCount * 5) + ' min';
-        document.getElementById('completed-count').textContent = completed;
-        
-      } catch (e) {
-        console.log('Overlay: Ingen data tillgänglig');
+        const stored = localStorage.getItem(STORAGE_KEY);
+        return stored ? JSON.parse(stored) : {queue: [], currentOrder: null, completed: 0};
+      } catch(e) {
+        return {queue: [], currentOrder: null, completed: 0};
       }
     }
+    
+    function loadData() {
+      const data = getData();
+      
+      // Nuvarande order
+      const currentSection = document.getElementById('current-section');
+      const currentUser = document.getElementById('current-user');
+      const currentProducts = document.getElementById('current-products');
+      
+      if (data.currentOrder) {
+        currentSection.classList.remove('inactive');
+        currentUser.textContent = data.currentOrder.username;
+        currentProducts.innerHTML = `
+          <div class="current-product-row">
+            <span class="product-icon">📦</span>
+            <span>${data.currentOrder.product}</span>
+          </div>
+        `;
+      } else {
+        currentSection.classList.add('inactive');
+        currentUser.textContent = '@väntar...';
+        currentProducts.innerHTML = '<div class="current-product-row">Ingen order öppnas just nu</div>';
+      }
+      
+      // Kölista - visa bara Rip n Ship (inte events)
+      const waitingQueue = (data.queue || []).filter(o => o.status === 'waiting' && o.type !== 'event');
+      document.getElementById('queue-count').textContent = waitingQueue.length;
+      
+      const queueList = document.getElementById('queue-list');
+      
+      if (waitingQueue.length === 0) {
+        queueList.innerHTML = '<div class="empty-state">Ingen kö just nu</div>';
+      } else {
+        let html = '';
+        for (let i = 0; i < Math.min(waitingQueue.length, 4); i++) {
+          const order = waitingQueue[i];
+          html += `
+            <div class="queue-item">
+              <div class="queue-position">${i + 1}</div>
+              <div class="queue-info">
+                <div class="queue-username">${order.username}</div>
+                <div class="queue-meta">${order.product}</div>
+              </div>
+            </div>
+          `;
+        }
+        queueList.innerHTML = html;
+      }
+      
+      // Statistik
+      const totalPacksWaiting = waitingQueue.length;
+      const estMin = totalPacksWaiting * 5;
+      document.getElementById('est-time').textContent = estMin + ' min';
+      document.getElementById('completed-count').textContent = data.completed || 0;
+    }
 
+    // Ladda direkt och uppdatera var 3:e sekund
     loadData();
-    setInterval(loadData, 5000);
+    setInterval(loadData, 3000);
   </script>
 </body>
 </html>
