@@ -223,6 +223,9 @@
       // 🕐 Dynamisk tid baserad på faktisk historik
       const estMinutes = waiting.length * averageTimePerOrder;
       document.getElementById('stat-est').textContent = estMinutes + ' min (' + averageTimePerOrder + ' min/order)';
+      
+      // Debug - logga värden för felsökning
+      console.log('Admin ETA:', estMinutes, 'min (avg:', averageTimePerOrder, ', queue:', waiting.length, ')');
       document.getElementById('stat-revenue').textContent = revenue.toLocaleString() + ' kr';
       
       // Nuvarande order
