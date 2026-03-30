@@ -395,6 +395,9 @@
       const totalPacksWaiting = ripShipOnly.length;
       const avgTime = data.averageTimePerOrder || 5;
       const estMin = totalPacksWaiting * avgTime;
+      
+      // Debug - logga värden för felsökning
+      console.log('Overlay ETA:', estMin, 'min (avg:', avgTime, ', queue:', totalPacksWaiting, ')');
       document.getElementById('est-time').textContent = estMin + ' min';
       document.getElementById('completed-count').textContent = data.completed || 0;
     }
