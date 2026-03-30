@@ -283,6 +283,10 @@
     // 🔐 Lösenord
     const ADMIN_PASSWORD = 'demo123';
     
+    // 🔒 Lås-variabler för att förhindra dubbelklick
+    var isProcessing = false;
+    var processingId = null;
+    
     function checkLogin() {
       const input = document.getElementById('login-password').value;
       if (input === ADMIN_PASSWORD) {
@@ -414,27 +418,41 @@
       render();
     }
     
-    var isOpeningOrder = false;
     function openOrder(id) {
-      if (isOpeningOrder) return; // 🔒 Förhindra dubbelklick
+      // 🔒 Kolla om vi redan behandlar denna order
+      if (isProcessing && processingId === id) return;
+      if (isProcessing) return; // Väntar på annan operation
+      
       const data = getData();
       if (data.currentOrder) { alert('Stäng nuvarande order först'); return; }
       
       const order = data.queue.find(o => o.id === id);
       if (!order) return;
       
-      isOpeningOrder = true;
+      // 🔒 Lås
+      isProcessing = true;
+      processingId = id;
+      
       order.status = 'open';
       order.openedAt = new Date().toISOString();
       data.currentOrder = order;
       saveData(data);
       render();
-      setTimeout(() => { isOpeningOrder = false; }, 300);
+      
+      // 🔓 Lås upp efter 300ms
+      setTimeout(() => { 
+        isProcessing = false; 
+        processingId = null;
+      }, 300);
     }
     
     function completeCurrent() {
+      if (isProcessing) return;
+      
       const data = getData();
       if (!data.currentOrder) return;
+      
+      isProcessing = true;
       
       const duration = (Date.now() - new Date(data.currentOrder.openedAt).getTime()) / 60000;
       data.completionHistory = data.completionHistory || [];
@@ -449,37 +467,50 @@
       render();
       
       const next = getData().queue.find(o => o.status === 'waiting');
-      if (next) setTimeout(() => openOrder(next.id), 300);
+      if (next) {
+        setTimeout(() => {
+          openOrder(next.id);
+          isProcessing = false;
+        }, 300);
+      } else {
+        isProcessing = false;
+      }
     }
     
-    var isSkippingCurrent = false;
     function skipCurrentOrder() {
-      if (isSkippingCurrent) return; // 🔒 Förhindra dubbelklick
+      if (isProcessing) return;
       const data = getData();
       if (!data.currentOrder) return;
       
-      isSkippingCurrent = true;
+      isProcessing = true;
+      
       const order = data.currentOrder;
       order.status = 'waiting';
       order.createdAt = new Date().toISOString();
       
-      // 🔍 Kolla att ordern inte redan finns i kön (förhindra dubbletter)
+      // 🔍 Kolla att ordern inte redan finns i kön
       const alreadyInQueue = data.queue.some(o => o.id === order.id);
       if (!alreadyInQueue) {
-        data.queue.push(order); // 🔄 Lägg tillbaka i kön!
+        data.queue.push(order);
       }
       
       data.currentOrder = null;
       saveData(data);
       render();
       
-      setTimeout(() => { isSkippingCurrent = false; }, 500); // 🔓 Lås upp efter 500ms
+      setTimeout(() => { isProcessing = false; }, 300);
     }
     
     function skipOrder(id) {
+      if (isProcessing && processingId === id) return;
+      if (isProcessing) return;
+      
       const data = getData();
       const orderIndex = data.queue.findIndex(o => o.id === id);
       if (orderIndex === -1) return;
+      
+      isProcessing = true;
+      processingId = id;
       
       // 🔄 Ta bort från nuvarande position och lägg sist
       const order = data.queue.splice(orderIndex, 1)[0];
@@ -488,18 +519,30 @@
       
       saveData(data);
       render();
+      
+      setTimeout(() => { 
+        isProcessing = false; 
+        processingId = null;
+      }, 300);
     }
     
     function removeOrder(id) {
+      if (isProcessing) return;
       if (!confirm('Ta bort denna order?')) return;
+      
+      isProcessing = true;
+      
       const data = getData();
       data.queue = data.queue.filter(o => o.id !== id);
       saveData(data);
       render();
+      
+      setTimeout(() => { isProcessing = false; }, 300);
     }
     
     function resetStats() {
       if (!confirm('Nollställa statistik?')) return;
+      
       const data = getData();
       data.completed = 0;
       data.totalRevenue = 0;
