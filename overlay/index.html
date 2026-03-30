@@ -330,9 +330,14 @@
     function getData() {
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
-        return stored ? JSON.parse(stored) : {queue: [], currentOrder: null, completed: 0};
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (!parsed.averageTimePerOrder) parsed.averageTimePerOrder = 5;
+          return parsed;
+        }
+        return {queue: [], currentOrder: null, completed: 0, averageTimePerOrder: 5};
       } catch(e) {
-        return {queue: [], currentOrder: null, completed: 0};
+        return {queue: [], currentOrder: null, completed: 0, averageTimePerOrder: 5};
       }
     }
     
@@ -384,9 +389,11 @@
         queueList.innerHTML = html;
       }
       
-      // Statistik
-      const totalPacksWaiting = waitingQueue.length;
-      const estMin = totalPacksWaiting * 5;
+      // Statistik - dynamisk tid
+      const ripShipOnly = waitingQueue.filter(o => o.type === 'ripship');
+      const totalPacksWaiting = ripShipOnly.length;
+      const avgTime = data.averageTimePerOrder || 5;
+      const estMin = totalPacksWaiting * avgTime;
       document.getElementById('est-time').textContent = estMin + ' min';
       document.getElementById('completed-count').textContent = data.completed || 0;
     }
