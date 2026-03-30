@@ -91,26 +91,22 @@
 
   <div class="container">
     <div class="main-content">
-      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
         <div class="stat-card">
           <div class="stat-label">Väntar</div>
           <div class="stat-value blue" id="stat-waiting">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Klara idag</div>
-          <div class="stat-value green" id="stat-completed">0</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Omsättning</div>
           <div class="stat-value" id="stat-revenue">0 kr</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Totalt ordrar</div>
-          <div class="stat-value purple" id="stat-total-orders">0</div>
+          <div class="stat-label">Öppnade ordrar idag</div>
+          <div class="stat-value green" id="stat-completed">0</div>
         </div>
-        <div class="stat-card" style="grid-column: span 2;">
+        <div class="stat-card">
           <div class="stat-label">Nästa i kön</div>
-          <div class="stat-value" id="stat-next-order" style="font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
+          <div class="stat-value" id="stat-next-order" style="font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
         </div>
       </div>
 
@@ -228,8 +224,7 @@
       document.getElementById('stat-completed').textContent = completed;
       document.getElementById('stat-revenue').textContent = revenue.toLocaleString() + ' kr';
       
-      // Nya stats
-      document.getElementById('stat-total-orders').textContent = waiting.length + completed;
+      // Nästa i kön (uppdateras automatiskt)
       
       // Nästa i kön
       const nextOrder = waiting.find(o => o.status === 'waiting');
@@ -445,35 +440,103 @@
     
     // Demo-data
     function addDemoData() {
-      const demoOrders = [
-        {username: '@StreamViewer', product: 'Booster Box', price: 1199, type: 'ripship'},
-        {username: '@LuckyWinner', product: 'Duckrace Lotteri', price: 50, type: 'event'},
-        {username: '@CardCollector', product: 'Elite Trainer Box', price: 449, type: 'ripship'},
-        {username: '@PokemonFan', product: 'Booster Pack x3', price: 135, type: 'ripship'},
-        {username: '@GiveawayKing', product: 'Pack Battle Entry', price: 100, type: 'event'}
-      ];
-      
       const data = getData();
+      const baseTime = new Date();
+      let timeOffset = 0;
       
-      demoOrders.forEach((o, i) => {
-        const date = new Date();
-        date.setMinutes(date.getMinutes() - (i * 5 + Math.floor(Math.random() * 3)));
-        
-        data.queue.push({
-          id: 'demo_' + Date.now() + '_' + i,
-          username: o.username,
-          product: o.product,
-          price: o.price,
-          type: o.type,
-          status: 'waiting',
-          createdAt: date.toISOString(),
-          source: 'demo'
-        });
-        data.totalRevenue += o.price;
+      // Person 1: En order
+      data.queue.push({
+        id: 'demo_' + Date.now() + '_1',
+        username: '@StreamViewer',
+        product: 'Booster Box',
+        price: 1199,
+        type: 'ripship',
+        status: 'waiting',
+        createdAt: new Date(baseTime.getTime() - (timeOffset++ * 5 * 60000)).toISOString(),
+        source: 'demo'
       });
+      data.totalRevenue += 1199;
+      
+      // Person 2: Event
+      data.queue.push({
+        id: 'demo_' + Date.now() + '_2',
+        username: '@LuckyWinner',
+        product: 'Duckrace Lotteri',
+        price: 50,
+        type: 'event',
+        status: 'waiting',
+        createdAt: new Date(baseTime.getTime() - (timeOffset++ * 5 * 60000)).toISOString(),
+        source: 'demo'
+      });
+      data.totalRevenue += 50;
+      
+      // Person 3: FLERA ordrar (samma person, olika produkter) 🎯
+      data.queue.push({
+        id: 'demo_' + Date.now() + '_3a',
+        username: '@StorKund',
+        product: 'Booster Box',
+        price: 1199,
+        type: 'ripship',
+        status: 'waiting',
+        createdAt: new Date(baseTime.getTime() - (timeOffset++ * 5 * 60000)).toISOString(),
+        source: 'demo'
+      });
+      data.totalRevenue += 1199;
+      
+      data.queue.push({
+        id: 'demo_' + Date.now() + '_3b',
+        username: '@StorKund',
+        product: 'Elite Trainer Box',
+        price: 449,
+        type: 'ripship',
+        status: 'waiting',
+        createdAt: new Date(baseTime.getTime() - (timeOffset++ * 2 * 60000)).toISOString(), // Samma person, 2 min senare
+        source: 'demo'
+      });
+      data.totalRevenue += 449;
+      
+      data.queue.push({
+        id: 'demo_' + Date.now() + '_3c',
+        username: '@StorKund',
+        product: 'Booster Pack x3',
+        price: 135,
+        type: 'ripship',
+        status: 'waiting',
+        createdAt: new Date(baseTime.getTime() - (timeOffset++ * 1 * 60000)).toISOString(), // Samma person, 1 min senare
+        source: 'demo'
+      });
+      data.totalRevenue += 135;
+      
+      // Person 4: En order
+      data.queue.push({
+        id: 'demo_' + Date.now() + '_4',
+        username: '@PokemonFan',
+        product: 'Booster Pack x10',
+        price: 450,
+        type: 'ripship',
+        status: 'waiting',
+        createdAt: new Date(baseTime.getTime() - (timeOffset++ * 5 * 60000)).toISOString(),
+        source: 'demo'
+      });
+      data.totalRevenue += 450;
+      
+      // Person 5: Event
+      data.queue.push({
+        id: 'demo_' + Date.now() + '_5',
+        username: '@GiveawayKing',
+        product: 'Pack Battle Entry',
+        price: 100,
+        type: 'event',
+        status: 'waiting',
+        createdAt: new Date(baseTime.getTime() - (timeOffset++ * 5 * 60000)).toISOString(),
+        source: 'demo'
+      });
+      data.totalRevenue += 100;
       
       saveData(data);
       render();
+      
+      alert('✅ Demo-data laddad! @StorKund har 3 olika ordrar i kön. Testa att öppna dem!');
     }
     
     // Initiera
