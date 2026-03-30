@@ -91,7 +91,7 @@
 
   <div class="container">
     <div class="main-content">
-      <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
         <div class="stat-card">
           <div class="stat-label">Väntar</div>
           <div class="stat-value blue" id="stat-waiting">0</div>
@@ -103,10 +103,6 @@
         <div class="stat-card">
           <div class="stat-label">Omsättning</div>
           <div class="stat-value" id="stat-revenue">0 kr</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Snitt/intäkt</div>
-          <div class="stat-value orange" id="stat-avg-revenue">0 kr</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Totalt ordrar</div>
@@ -233,8 +229,6 @@
       document.getElementById('stat-revenue').textContent = revenue.toLocaleString() + ' kr';
       
       // Nya stats
-      const avgRevenue = completed > 0 ? Math.round(revenue / completed) : 0;
-      document.getElementById('stat-avg-revenue').textContent = avgRevenue.toLocaleString() + ' kr';
       document.getElementById('stat-total-orders').textContent = waiting.length + completed;
       
       // Nästa i kön
