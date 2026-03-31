@@ -283,7 +283,11 @@
       </div>
 
       <div class="panel">
-        <div class="panel-title">🎨 Overlay-färger</div>
+        <div class="panel-title">🎨 Overlay-inställningar</div>
+        <div class="form-group">
+          <label class="form-label">Rubriktext</label>
+          <input type="text" class="form-input" id="overlay-title" value="TCG Queue" placeholder="Din text här...">
+        </div>
         <div class="form-group">
           <label class="form-label">Accentfärg</label>
           <input type="color" class="form-input" id="color-accent" value="#3b82f6" style="height: 40px; cursor: pointer;">
@@ -296,7 +300,7 @@
           <label class="form-label">Text</label>
           <input type="color" class="form-input" id="color-text" value="#ffffff" style="height: 40px; cursor: pointer;">
         </div>
-        <button class="btn btn-secondary btn-full" onclick="saveColors()">💾 Spara färger</button>
+        <button class="btn btn-secondary btn-full" onclick="saveColors()">💾 Spara</button>
         <button class="btn btn-danger btn-full" onclick="resetColors()" style="margin-top: 8px;">↩️ Återställ</button>
       </div>
     </div>
@@ -496,14 +500,18 @@
       isProcessing = true;
       
       const duration = (Date.now() - new Date(data.currentOrder.openedAt).getTime()) / 60000;
+      console.log('Order completed, duration:', duration.toFixed(2), 'minutes');
       data.completionHistory = data.completionHistory || [];
       data.completionHistory.push(duration);
       if (data.completionHistory.length > 20) data.completionHistory.shift();
-      data.averageTimePerOrder = Math.round(data.completionHistory.reduce((a,b) => a+b, 0) / data.completionHistory.length);
+      const avg = data.completionHistory.reduce((a,b) => a+b, 0) / data.completionHistory.length;
+      data.averageTimePerOrder = Math.round(avg);
+      console.log('New average:', data.averageTimePerOrder, 'min (history:', data.completionHistory.length, 'orders)');
       
       data.currentOrder = null;
       data.completed++;
       saveData(data);
+      document.getElementById('stat-avg-time').textContent = data.averageTimePerOrder + ' min';
       render();
       
       const next = getData().queue.find(o => o.status === 'waiting');
@@ -597,6 +605,7 @@
     // 🎨 Färghantering för overlay
     function loadColors() {
       const colors = JSON.parse(localStorage.getItem('tcg_overlay_colors') || '{}');
+      document.getElementById('overlay-title').value = colors.title || 'TCG Queue';
       document.getElementById('color-accent').value = colors.accent || '#3b82f6';
       document.getElementById('color-bg').value = colors.bg || '#0a0a0a';
       document.getElementById('color-text').value = colors.text || '#ffffff';
@@ -604,16 +613,18 @@
     
     function saveColors() {
       const colors = {
+        title: document.getElementById('overlay-title').value,
         accent: document.getElementById('color-accent').value,
         bg: document.getElementById('color-bg').value,
         text: document.getElementById('color-text').value
       };
       localStorage.setItem('tcg_overlay_colors', JSON.stringify(colors));
       localStorage.setItem('tcg_sync_trigger', Date.now().toString());
-      alert('✅ Färger sparade! Uppdatera overlay för att se ändringar.');
+      alert('✅ Inställningar sparade! Uppdatera overlay för att se ändringar.');
     }
     
     function resetColors() {
+      document.getElementById('overlay-title').value = 'TCG Queue';
       document.getElementById('color-accent').value = '#3b82f6';
       document.getElementById('color-bg').value = '#0a0a0a';
       document.getElementById('color-text').value = '#ffffff';
