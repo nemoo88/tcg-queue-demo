@@ -257,7 +257,7 @@
   <div class="overlay-container">
     <div class="overlay-header">
       <div class="brand">
-        <span>TCG Queue</span>
+        <span id="overlay-brand">TCG Queue</span>
       </div>
     </div>
     
@@ -308,9 +308,12 @@
       }
     }
     
-    // 🎨 Applicera färger från admin
+    // 🎨 Applicera färger och titel från admin
     function applyColors() {
       const colors = JSON.parse(localStorage.getItem('tcg_overlay_colors') || '{}');
+      if (colors.title) {
+        document.getElementById('overlay-brand').textContent = colors.title;
+      }
       if (colors.accent) {
         document.documentElement.style.setProperty('--accent', colors.accent);
       }
