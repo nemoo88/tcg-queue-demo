@@ -1,83 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TCG Queue - Demo</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #050505;
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 24px;
-    }
-    .logo { font-size: 64px; margin-bottom: 24px; }
-    h1 { font-size: 32px; margin-bottom: 12px; }
-    p { color: #888; margin-bottom: 32px; max-width: 400px; }
-    .links { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
-    .btn {
-      padding: 16px 32px;
-      background: #3b82f6;
-      color: white;
-      text-decoration: none;
-      border-radius: 12px;
-      font-weight: 700;
-      transition: opacity 0.2s;
-    }
-    .btn:hover { opacity: 0.9; }
-    .btn-secondary { background: #1a1a1a; border: 1px solid #333; }
-    .lang-switch {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      display: flex;
-      gap: 8px;
-    }
-    .lang-switch a {
-      padding: 6px 12px;
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 6px;
-      font-size: 12px;
-      color: #888;
-      text-decoration: none;
-    }
-    .lang-switch a.active { background: #3b82f6; color: white; }
-    .demo-badge {
-      position: fixed;
-      top: 24px;
-      right: 24px;
-      background: rgba(245,158,11,0.1);
-      border: 1px solid rgba(245,158,11,0.3);
-      color: #f59e0b;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-  </style>
-</head>
-<body>
-  <div class="demo-badge">⚠️ DEMO MODE</div>
-  <div class="lang-switch">
-    <a href="index.html">🇸🇪</a>
-    <a href="index-en.html" class="active">🇬🇧</a>
-  </div>
-  
-  <div class="logo">🎴</div>
-  <h1>TCG Queue System</h1>
-  <p>Demo version with local storage. All data is only saved in your browser.</p>
-  
-  <div class="links">
-    <a href="admin/index.html" class="btn">🎛️ Admin Panel</a>
-    <a href="overlay/index.html" target="_blank" class="btn btn-secondary">📺 Overlay</a>
-  </div>
-</body>
-</html>
+# 🎴 TCG Queue System - Demo
+
+A demo version of the TCG Live Rip n Ship Queue System.
+
+## 🚀 Live Demo
+
+Visit: [https://nemoo88.github.io/tcg-queue-demo/](https://nemoo88.github.io/tcg-queue-demo/)
+
+## 📁 Files
+
+```
+├── index.html          # Choose language
+├── index-en.html       # Choose language
+├── admin/
+│   ├── index.html      # Queue Manager (Swedish)
+│   └── index-en.html   # Queue Manager (English)
+└── overlay/
+    └── index.html      # OBS Overlay
+```
+
+## 🔐 Login
+
+**Password:** `demo`
+
+Displayed on the login screen.
+
+## ✨ Features
+
+- ✅ **Queue Management** - View and manage all orders
+- ✅ **Multiple products per order** - Add several products on the same line
+- ✅ **⏭️ Skip order** - Move order to the end of the queue
+- ✅ **OPEN button** - Open order on stream
+- ✅ **✕ Remove button** - Remove order from queue
+- ✅ **Time waiting** - See how long the order has been waiting
+- ✅ **Events** - Handle giveaways, duckrace, pack battles
+- ✅ **OBS Overlay** - Show queue live in your stream
+- ✅ **Dynamic ETA** - System learns your speed and updates estimated time
+- ✅ **Reset statistics** - Start over with new numbers
+
+### 🕐 Dynamic Time/ETA
+
+The system automatically learns how long you need per order:
+
+- **How it works:** When you mark an order as "Done", the time it took is recorded
+- **Average calculation:** System saves the 20 latest times and calculates an average
+- **What affects it:** Only "Done - Next" records time. Skipping an order does not affect the average.
+- **ETA in overlay:** `(number of orders) × (average time) = estimated time remaining`
+- **Starting value:** 5 minutes per order before the system learns your pace
+
+Example: If average is 3 minutes and you have 4 orders in queue → ETA: 12 minutes
+
+## ⚠️ Limitations (Demo)
+
+- Data is only saved in the browser (localStorage)
+- Everything disappears if you clear cache or switch browser
+- No Shopify/Ecwid/Quickbutik integration (manual input only)
+
+## 🎮 Quick Start
+
+1. Go to Queue Manager (`/admin/`)
+2. Login with password: `demo`
+3. Load demo data
+4. Test the features!
+
+## 🛒 Full Version
+
+Full version includes:
+- **Shopify** integration (automatic orders via webhook)
+- **Ecwid** integration (automatic orders via webhook)
+- **Quickbutik** integration (polling every 30 seconds)
+- Netlify Blob Storage (permanent storage)
+- Docker version for local hosting
+- Server-side password protection
+- Custom styling (change colors, sizes in CSS)
+
+---
+
+**© 2026 TCG Queue System – Demo Version**
