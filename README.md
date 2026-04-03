@@ -53,7 +53,7 @@ Exempel: Om snittet är 3 minuter och du har 4 ordrar i kön → ETA: 12 minuter
 
 - Data sparas bara i webbläsaren (localStorage)
 - Allt försvinner om du rensar cache eller byter webbläsare
-- Ingen Shopify-integration (endast manuell inmatning)
+- Ingen Shopify/Ecwid/Quickbutik-integration (endast manuell inmatning)
 
 ## 🎮 Snabbstart
 
@@ -65,8 +65,11 @@ Exempel: Om snittet är 3 minuter och du har 4 ordrar i kön → ETA: 12 minuter
 ## 🛒 Fullversion
 
 Fullversion inkluderar:
-- Shopify-integration (automatiska ordrar)
+- **Shopify**-integration (automatiska ordrar via webhook)
+- **Ecwid**-integration (automatiska ordrar via webhook)
+- **Quickbutik**-integration (polling var 30:e sekund)
 - Netlify Blob Storage (permanent lagring)
+- Docker-version för lokal hosting
 - Server-side lösenordsskydd
 - Anpassningsbar design (ändra färger, storlekar i CSS)
 
